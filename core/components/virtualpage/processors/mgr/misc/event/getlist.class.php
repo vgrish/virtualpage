@@ -7,8 +7,8 @@ class vpEventGetListProcessor extends modPluginEventGetListProcessor {
 	public $permission = 'view_plugin';
 
 	public function getData() {
-		$exclude = array('mlmscript');
-		$exclude = array_merge($exclude, array_map('trim', explode(',', $this->modx->getOption('virtualpage_exclude_events'))));
+		$exclude = array('virtualpage');
+		$exclude = array_merge($exclude, array_map('trim', explode(',', $this->modx->getOption('virtualpage_exclude_event_groupname'))));
 
 		$criteria = array();
 		$criteria[] = array(
