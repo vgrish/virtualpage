@@ -6,6 +6,8 @@ $_lang['vp_menu_update'] = 'Изменить';
 $_lang['vp_menu_remove'] = 'Удалить';
 $_lang['vp_menu_active'] = 'Активировать';
 
+$_lang['vp_menu_remove_confirm'] = 'Вы уверены, что хотите удалить эту запись?';
+
 // buttons
 $_lang['vp_btn_create'] = 'Создать';
 $_lang['vp_btn_save'] = 'Сохранить';
@@ -38,3 +40,4 @@ $_lang['vp_timestamp'] = 'Метка времени';
 $_lang['vp_resource'] = 'Ресурс';
 $_lang['vp_comment'] = 'Комментарий';
 $_lang['vp_options'] = 'Опции';
+
