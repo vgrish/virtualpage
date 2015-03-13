@@ -1,6 +1,6 @@
 <?php
-class vpEventRemoveProcessor extends modObjectRemoveProcessor  {
-	public $classKey = 'vpEvent';
+class vpRouteRemoveProcessor extends modObjectRemoveProcessor  {
+	public $classKey = 'vpRoute';
 	public $languageTopics = array('virtualpage');
 	public $permission = 'vpsetting_save';
 
@@ -19,4 +19,4 @@ class vpEventRemoveProcessor extends modObjectRemoveProcessor  {
 	}
 
 }
-return 'vpEventRemoveProcessor';
+return 'vpRouteRemoveProcessor';

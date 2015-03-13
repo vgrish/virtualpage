@@ -29,18 +29,18 @@ virtualpage.combo.Event = function(config) {
     config = config || {};
     Ext.applyIf(config, {
         name: 'event'
-        ,primaryKey: 'name'
-        , hiddenName: 'name'
+        , hiddenName: 'event'
         , displayField: 'name'
-        , valueField: 'name'
+        , valueField: 'id'
         , editable: true
-        , fields: ['name','id','groupname','active']
+        , fields: ['name','id']
         , pageSize: 10
         , emptyText: _('vp_combo_select')
         , hideMode: 'offsets'
         , url: virtualpage.config.connector_url
         , baseParams: {
             action: 'mgr/settings/event/getlist',
+            combo: true,
             limit: 0
         }
     });

@@ -5,6 +5,14 @@ virtualpage.utils.renderBoolean = function (value, props, row) {
 		: String.format('<span class="red">{0}</span>', _('no'));
 }
 
+
+virtualpage.utils.renderEvent = function (value, props, row) {
+	return row.json.event_name
+		? row.json.event_name
+		: value;
+}
+
+
 virtualpage.utils.getMenu = function (actions, grid, selected) {
 	var menu = [];
 	var cls, icon, title, action = '';

@@ -38,7 +38,7 @@ virtualpage.grid.Event = function(config) {
         ,baseParams: {
             action: 'mgr/settings/event/getlist'
         }
-        ,fields: ['id', 'name', 'description', 'active', 'bonuses']
+        ,fields: ['id', 'name', 'description', 'active']
         ,autoHeight: true
         ,paging: true
         ,remoteSort: true
@@ -115,7 +115,7 @@ Ext.extend(virtualpage.grid.Event,MODx.grid.Grid,{
         if (!this.menu.record) return false;
 
         MODx.msg.confirm({
-            title: _('vp_menu_remove') + '"' + this.menu.record.name + '"'
+            title: _('vp_menu_remove') + ' "' + this.menu.record.name + '"'
             ,text: _('vp_menu_remove_confirm')
             ,url: this.config.url
             ,params: {

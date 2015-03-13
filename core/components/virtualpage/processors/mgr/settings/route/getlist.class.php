@@ -1,106 +1,72 @@
 <?php
-
-/**
- * Get a list of Items
- */
 class vpRouteGetListProcessor extends modObjectGetListProcessor {
-	public $objectType = 'virtualpageItem';
-	public $classKey = 'virtualpageItem';
-	public $defaultSortField = 'id';
-	public $defaultSortDirection = 'DESC';
-	//public $permission = 'list';
-
-
-	/**
-	 * * We doing special check of permission
-	 * because of our objects is not an instances of modAccessibleObject
-	 *
-	 * @return boolean|string
-	 */
-	public function beforeQuery() {
-		if (!$this->checkPermissions()) {
+	public $classKey = 'vpRoute';
+	public $defaultSortField = 'rank';
+	public $defaultSortDirection  = 'asc';
+	public $permission = '';
+	/** {@inheritDoc} */
+	public function initialize() {
+		if (!$this->modx->hasPermission($this->permission)) {
 			return $this->modx->lexicon('access_denied');
 		}
-
-		return true;
+		return parent::initialize();
 	}
-
-
-	/**
-	 * @param xPDOQuery $c
-	 *
-	 * @return xPDOQuery
-	 */
+	/** {@inheritDoc} */
 	public function prepareQueryBeforeCount(xPDOQuery $c) {
-		$query = trim($this->getProperty('query'));
-		if ($query) {
-			$c->where(array(
-				'name:LIKE' => "%{$query}%",
-				'OR:description:LIKE' => "%{$query}%",
-			));
-		}
 
+		$c->leftJoin('vpEvent','vpEvent', '`vpRoute`.`event` = `vpEvent`.`id`');
+		$routeColumns = $this->modx->getSelectColumns('vpRoute', 'vpRoute', '', array(), true);
+		$c->select($routeColumns . ', `vpEvent`.`name` as `event_name`');
+
+		if ($active = $this->getProperty('active')) {
+			$c->where(array('active' => $active));
+		}
+		if ($this->getProperty('combo')) {
+			$c->select('id,name');
+			$c->where(array('active' => 1));
+		}
 		return $c;
 	}
-
-
-	/**
-	 * @param xPDOObject $object
-	 *
-	 * @return array
-	 */
-	public function prepareRow(xPDOObject $object) {
-		$array = $object->toArray();
-		$array['actions'] = array();
-
-		// Edit
-		$array['actions'][] = array(
-			'cls' => '',
-			'icon' => 'icon icon-edit',
-			'title' => $this->modx->lexicon('virtualpage_item_update'),
-			//'multiple' => $this->modx->lexicon('virtualpage_items_update'),
-			'action' => 'updateItem',
-			'button' => true,
-			'menu' => true,
-		);
-
-		if (!$array['active']) {
-			$array['actions'][] = array(
-				'cls' => '',
-				'icon' => 'icon icon-power-off action-green',
-				'title' => $this->modx->lexicon('virtualpage_item_enable'),
-				'multiple' => $this->modx->lexicon('virtualpage_items_enable'),
-				'action' => 'enableItem',
-				'button' => true,
-				'menu' => true,
-			);
+	/** {@inheritDoc} */
+	public function getData() {
+		$data = array();
+		$limit = intval($this->getProperty('limit'));
+		$start = intval($this->getProperty('start'));
+		/* query for chunks */
+		$c = $this->modx->newQuery($this->classKey);
+		$c = $this->prepareQueryBeforeCount($c);
+		$data['total'] = $this->modx->getCount($this->classKey,$c);
+		$c = $this->prepareQueryAfterCount($c);
+		$sortClassKey = $this->getSortClassKey();
+		$sortKey = $this->modx->getSelectColumns($sortClassKey,$this->getProperty('sortAlias',$sortClassKey),'',array($this->getProperty('sort')));
+		if (empty($sortKey)) $sortKey = $this->getProperty('sort');
+		$c->sortby($sortKey,$this->getProperty('dir'));
+		if ($limit > 0) {
+			$c->limit($limit,$start);
 		}
-		else {
-			$array['actions'][] = array(
-				'cls' => '',
-				'icon' => 'icon icon-power-off action-gray',
-				'title' => $this->modx->lexicon('virtualpage_item_disable'),
-				'multiple' => $this->modx->lexicon('virtualpage_items_disable'),
-				'action' => 'disableItem',
-				'button' => true,
-				'menu' => true,
-			);
+		if ($c->prepare() && $c->stmt->execute()) {
+			$data['results'] = $c->stmt->fetchAll(PDO::FETCH_ASSOC);
 		}
-
-		// Remove
-		$array['actions'][] = array(
-			'cls' => '',
-			'icon' => 'icon icon-trash-o action-red',
-			'title' => $this->modx->lexicon('virtualpage_item_remove'),
-			'multiple' => $this->modx->lexicon('virtualpage_items_remove'),
-			'action' => 'removeItem',
-			'button' => true,
-			'menu' => true,
-		);
-
-		return $array;
+		return $data;
 	}
+	/** {@inheritDoc} */
+	public function iterate(array $data) {
+		$list = array();
+		$list = $this->beforeIteration($list);
+		$this->currentIndex = 0;
+		/** @var xPDOObject|modAccessibleObject $object */
+		foreach ($data['results'] as $array) {
+			$list[] = $this->prepareArray($array);
+			$this->currentIndex++;
+		}
+		$list = $this->afterIteration($list);
+		return $list;
+	}
+	/** {@inheritDoc} */
+	public function prepareArray(array $data) {
+		$data['active'] = (int) $data['active'];
 
+		return $data;
+	}
 }
-
 return 'vpRouteGetListProcessor';
