@@ -3,6 +3,14 @@
 $plugins = array();
 
 $tmp = array(
+	'vpService' => array(
+		'file' => 'virtualpage_s',
+		'description' => '',
+		'locked' => 0,
+		'events' => array(
+			'OnHandleRequest' => array(),
+		)
+	),
 	'vpEvent' => array(
 		'file' => 'virtualpage',
 		'description' => '',

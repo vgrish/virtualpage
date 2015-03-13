@@ -6,5 +6,6 @@ if(!$virtualpage->active) {return '';}
 if(isset($_REQUEST['vp_die'])) {return '';}
 //
 $eventName = $modx->event->name;
-//$listEvent = $virtualpage->getEvents();
-//
+if (method_exists($virtualpage, $eventName)) {
+	$virtualpage->$eventName($scriptProperties);
+}
