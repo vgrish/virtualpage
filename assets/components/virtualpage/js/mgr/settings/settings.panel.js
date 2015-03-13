@@ -30,14 +30,24 @@ virtualpage.panel.Settings = function(config) {
             , hideMode: 'offsets'
 
             , items: [{
-                title: _('vp_events_bonuses')
+                title: _('vp_route')
                 , items: [{
-                    html: '<p>' + _('vp_events_bonuses_intro') + 'rr'+'</p>'
+                    html: '<p>' + _('vp_route_intro') + '</p>'
                     , border: false
                     , bodyCssClass: 'panel-desc'
                     , bodyStyle: 'margin-bottom: 10px'
                 }, {
-                    //xtype: 'virtualpage-grid-route'
+                    xtype: 'virtualpage-grid-route'
+                }]
+            },{
+                title: _('vp_event')
+                , items: [{
+                    html: '<p>' + _('mlm_event_intro') + '</p>'
+                    , border: false
+                    , bodyCssClass: 'panel-desc'
+                    , bodyStyle: 'margin-bottom: 10px'
+                }, {
+                    xtype: 'virtualpage-grid-event'
                 }]
             }
 

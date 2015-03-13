@@ -1,4 +1,4 @@
-virtualpage.grid.Route = function(config) {
+virtualpage.grid.Event = function(config) {
     config = config || {};
 
     this.exp = new Ext.grid.RowExpander({
@@ -19,7 +19,7 @@ virtualpage.grid.Route = function(config) {
                     MODx.Ajax.request({
                         url: virtualpage.config.connector_url
                         ,params: {
-                            action: config.action || 'mgr/settings/route/sort'
+                            action: config.action || 'mgr/settings/event/sort'
                             ,source: source
                             ,target: target
                         }
@@ -33,88 +33,88 @@ virtualpage.grid.Route = function(config) {
         });
     };
     Ext.applyIf(config,{
-        id: 'virtualpage-grid-route'
+        id: 'virtualpage-grid-event'
         ,url: virtualpage.config.connector_url
         ,baseParams: {
-            action: 'mgr/settings/route/getlist'
+            action: 'mgr/settings/event/getlist'
         }
         ,fields: ['id', 'name', 'description', 'active', 'bonuses']
         ,autoHeight: true
         ,paging: true
         ,remoteSort: true
-        ,save_action: 'mgr/settings/route/updatefromgrid'
+        ,save_action: 'mgr/settings/event/updatefromgrid'
         ,autosave: true
         ,plugins: this.exp
         ,columns: [this.exp
             ,{header: _('vp_id'),dataIndex: 'id',width: 50, sortable: true}
-            //,{header: _('vp_name'),dataIndex: 'name',width: 150, editor: {xtype: 'virtualpage-combo-route', allowBlank: false}, sortable: true}
+            ,{header: _('vp_name'),dataIndex: 'name',width: 150, editor: {xtype: 'virtualpage-combo-event', allowBlank: false}, sortable: true}
             ,{header: _('vp_active'),dataIndex: 'active',sortable:true, width:50, editor:{xtype:'combo-boolean', renderer:'boolean'}}
         ]
         ,tbar: [{
             text: _('vp_btn_create')
-            ,handler: this.createRoute
+            ,handler: this.createEvent
             ,scope: this
         }]
         ,ddGroup: 'dd'
         ,enableDragDrop: true
         ,listeners: {render: {fn: this.dd, scope: this}}
     });
-    virtualpage.grid.Route.superclass.constructor.call(this,config);
+    virtualpage.grid.Event.superclass.constructor.call(this,config);
 };
-Ext.extend(virtualpage.grid.Route,MODx.grid.Grid,{
+Ext.extend(virtualpage.grid.Event,MODx.grid.Grid,{
     windows: {}
 
     ,getMenu: function() {
         var m = [];
         m.push({
             text: _('vp_menu_update')
-            ,handler: this.updateRoute
+            ,handler: this.updateEvent
         });
         m.push('-');
         m.push({
             text: _('vp_menu_remove')
-            ,handler: this.removeRoute
+            ,handler: this.removeEvent
         });
         this.addContextMenuItem(m);
     }
 
-    ,createRoute: function(btn,e) {
-        if (!this.windows.createRoute) {
-            this.windows.createRoute = MODx.load({
-                xtype: 'virtualpage-window-route-create'
-                ,fields: this.getRouteFields('create')
+    ,createEvent: function(btn,e) {
+        if (!this.windows.createEvent) {
+            this.windows.createEvent = MODx.load({
+                xtype: 'virtualpage-window-event-create'
+                ,fields: this.getEventFields('create')
                 ,listeners: {
                     success: {fn:function() { this.refresh(); },scope:this}
                 }
             });
         }
-        this.windows.createRoute.fp.getForm().reset();
-        this.windows.createRoute.show(e.target);
-        Ext.getCmp('virtualpage-route-type_desc-create').getEl().dom.innerText = '';
+        this.windows.createEvent.fp.getForm().reset();
+        this.windows.createEvent.show(e.target);
+        Ext.getCmp('virtualpage-event-type_desc-create').getEl().dom.innerText = '';
     }
 
-    ,updateRoute: function(btn,e) {
+    ,updateEvent: function(btn,e) {
         if (!this.menu.record || !this.menu.record.id) return false;
         var r = this.menu.record;
 
-        if (!this.windows.updateRoute) {
-            this.windows.updateRoute = MODx.load({
-                xtype: 'virtualpage-window-route-update'
+        if (!this.windows.updateEvent) {
+            this.windows.updateEvent = MODx.load({
+                xtype: 'virtualpage-window-event-update'
                 ,record: r
-                ,fields: this.getRouteFields('update')
+                ,fields: this.getEventFields('update')
                 ,listeners: {
                     success: {fn:function() { this.refresh(); },scope:this}
                 }
             });
         }
-        this.windows.updateRoute.fp.getForm().reset();
-        this.windows.updateRoute.fp.getForm().setValues(r);
-        this.windows.updateRoute.show(e.target);
+        this.windows.updateEvent.fp.getForm().reset();
+        this.windows.updateEvent.fp.getForm().setValues(r);
+        this.windows.updateEvent.show(e.target);
         this.enableBonuses(r.bonuses);
-        Ext.getCmp('virtualpage-route-type_desc-update').getEl().dom.innerText = r.type ? _('vp_link_'+r.type+'_desc') : '';
+        Ext.getCmp('virtualpage-event-type_desc-update').getEl().dom.innerText = r.type ? _('vp_link_'+r.type+'_desc') : '';
     }
 
-    ,removeRoute: function(btn,e) {
+    ,removeEvent: function(btn,e) {
         if (!this.menu.record) return false;
 
         MODx.msg.confirm({
@@ -122,7 +122,7 @@ Ext.extend(virtualpage.grid.Route,MODx.grid.Grid,{
             ,text: _('vp_menu_remove_confirm')
             ,url: this.config.url
             ,params: {
-                action: 'mgr/settings/route/remove'
+                action: 'mgr/settings/event/remove'
                 ,id: this.menu.record.id
             }
             ,listeners: {
@@ -131,22 +131,22 @@ Ext.extend(virtualpage.grid.Route,MODx.grid.Grid,{
         });
     }
 
-    ,getRouteFields: function(type) {
+    ,getEventFields: function(type) {
         var fields = [];
         var bonuses = this.getAvailableBonuses();
         fields.push(
-            {xtype: 'hidden',name: 'id', id: 'virtualpage-route-id-'+type}
-            ,{xtype: 'virtualpage-combo-route',fieldLabel: _('vp_name'), name: 'name', allowBlank: false, anchor: '99%', id: 'virtualpage-route-name-'+type
+            {xtype: 'hidden',name: 'id', id: 'virtualpage-event-id-'+type}
+            ,{xtype: 'virtualpage-combo-event',fieldLabel: _('vp_name'), name: 'name', allowBlank: false, anchor: '99%', id: 'virtualpage-event-name-'+type
                 ,listeners: {
                     select: function(combo,row,value) {
-                        Ext.getCmp('virtualpage-route-type_desc-'+type).getEl().dom.innerText = _('vp_route_group') + row.data.groupname;
+                        Ext.getCmp('virtualpage-event-type_desc-'+type).getEl().dom.innerText = _('vp_event_group') + row.data.groupname;
                     }
                 }
             }
-            ,{html: '',id: 'virtualpage-route-type_desc-'+type,
+            ,{html: '',id: 'virtualpage-event-type_desc-'+type,
                 style: 'font-style: italic; padding: 10px; color: #555555;'
             }
-            ,{xtype: 'textarea', fieldLabel: _('vp_description'), name: 'description', anchor: '99%', id: 'virtualpage-route-description-'+type}
+            ,{xtype: 'textarea', fieldLabel: _('vp_description'), name: 'description', anchor: '99%', id: 'virtualpage-event-description-'+type}
         );
 
         if (bonuses.length > 0) {
@@ -155,13 +155,13 @@ Ext.extend(virtualpage.grid.Route,MODx.grid.Grid,{
                     ,fieldLabel: _('vp_bonuses')
                     ,columns: 2
                     ,items: bonuses
-                    ,id: 'mlm-route-bonuses-'+type
+                    ,id: 'mlm-event-bonuses-'+type
                 }
             );
         }
 
         fields.push(
-            {xtype: 'xcheckbox', fieldLabel: '', boxLabel: _('vp_active'), name: 'active', id: 'virtualpage-route-active-'+type}
+            {xtype: 'xcheckbox', fieldLabel: '', boxLabel: _('vp_active'), name: 'active', id: 'virtualpage-event-active-'+type}
         );
 
         return fields;
@@ -186,7 +186,7 @@ Ext.extend(virtualpage.grid.Route,MODx.grid.Grid,{
 
     ,enableBonuses: function(bonuses) {
         if (bonuses.length < 1) {return;}
-        var checkboxgroup = Ext.getCmp('mlm-route-bonuses-update');
+        var checkboxgroup = Ext.getCmp('mlm-event-bonuses-update');
         Ext.each(checkboxgroup.items.items, function(item) {
             if (bonuses[item.bonus_id] == 1) {
                 item.setValue(true);
@@ -198,10 +198,10 @@ Ext.extend(virtualpage.grid.Route,MODx.grid.Grid,{
     }
 
 });
-Ext.reg('virtualpage-grid-route',virtualpage.grid.Route);
+Ext.reg('virtualpage-grid-event',virtualpage.grid.Event);
 
 
-virtualpage.window.CreateRoute = function(config) {
+virtualpage.window.CreateEvent = function(config) {
     config = config || {};
     this.ident = config.ident || 'mecitem'+Ext.id();
     Ext.applyIf(config,{
@@ -212,17 +212,17 @@ virtualpage.window.CreateRoute = function(config) {
         ,labelAlign: 'left'
         ,labelWidth: 180
         ,url: virtualpage.config.connector_url
-        ,action: 'mgr/settings/route/create'
+        ,action: 'mgr/settings/event/create'
         ,fields: config.fields
-        ,keys: [{key: Ext.RouteObject.ENTER,shift: true,fn: function() {this.submit() },scope: this}]
+        ,keys: [{key: Ext.EventObject.ENTER,shift: true,fn: function() {this.submit() },scope: this}]
     });
-    virtualpage.window.CreateRoute.superclass.constructor.call(this,config);
+    virtualpage.window.CreateEvent.superclass.constructor.call(this,config);
 };
-Ext.extend(virtualpage.window.CreateRoute,MODx.Window);
-Ext.reg('virtualpage-window-route-create',virtualpage.window.CreateRoute);
+Ext.extend(virtualpage.window.CreateEvent,MODx.Window);
+Ext.reg('virtualpage-window-event-create',virtualpage.window.CreateEvent);
 
 
-virtualpage.window.UpdateRoute = function(config) {
+virtualpage.window.UpdateEvent = function(config) {
     config = config || {};
     this.ident = config.ident || 'meuitem'+Ext.id();
     Ext.applyIf(config,{
@@ -233,11 +233,11 @@ virtualpage.window.UpdateRoute = function(config) {
         ,labelAlign: 'left'
         ,labelWidth: 180
         ,url: virtualpage.config.connector_url
-        ,action: 'mgr/settings/route/update'
+        ,action: 'mgr/settings/event/update'
         ,fields: config.fields
-        ,keys: [{key: Ext.RouteObject.ENTER,shift: true,fn: function() {this.submit() },scope: this}]
+        ,keys: [{key: Ext.EventObject.ENTER,shift: true,fn: function() {this.submit() },scope: this}]
     });
-    virtualpage.window.UpdateRoute.superclass.constructor.call(this,config);
+    virtualpage.window.UpdateEvent.superclass.constructor.call(this,config);
 };
-Ext.extend(virtualpage.window.UpdateRoute,MODx.Window);
-Ext.reg('virtualpage-window-route-update',virtualpage.window.UpdateRoute);
+Ext.extend(virtualpage.window.UpdateEvent,MODx.Window);
+Ext.reg('virtualpage-window-event-update',virtualpage.window.UpdateEvent);
