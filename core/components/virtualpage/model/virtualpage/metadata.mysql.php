@@ -1,8 +1,9 @@
 <?php
 
-$xpdo_meta_map = array(
-	'xPDOSimpleObject' =>
-		array(
-			0 => 'virtualpageItem',
-		),
+$xpdo_meta_map = array (
+  'xPDOSimpleObject' => 
+  array (
+    0 => 'vpRoute',
+    1 => 'vpEvent',
+  ),
 );

@@ -130,6 +130,7 @@ Ext.extend(virtualpage.grid.Route,MODx.grid.Grid,{
             ,params: {
                 action: 'mgr/settings/route/remove'
                 ,id: this.menu.record.id
+                ,event: this.menu.record.event
             }
             ,listeners: {
                 success: {fn:function(r) {this.refresh();}, scope:this}
