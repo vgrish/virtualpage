@@ -5,9 +5,12 @@ $_lang['virtualpage'] = 'virtualpage';
 $_lang['vp_menu_desc'] = 'Пример расширения для разработки.';
 
 $_lang['vp_settings'] = 'Настройки';
+
 $_lang['vp_route'] = 'Маршруты';
 $_lang['vp_route_intro'] = 'Панель управления маршрутами.';
 
+$_lang['vp_event'] = 'События';
+$_lang['vp_event_intro'] = 'Панель управления событиями.';
 
 
 $_lang['virtualpage_intro_msg'] = 'Вы можете выделять сразу несколько предметов при помощи Shift или Ctrl.';

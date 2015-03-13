@@ -42,7 +42,7 @@ virtualpage.panel.Settings = function(config) {
             },{
                 title: _('vp_event')
                 , items: [{
-                    html: '<p>' + _('mlm_event_intro') + '</p>'
+                    html: '<p>' + _('vp_event_intro') + '</p>'
                     , border: false
                     , bodyCssClass: 'panel-desc'
                     , bodyStyle: 'margin-bottom: 10px'
