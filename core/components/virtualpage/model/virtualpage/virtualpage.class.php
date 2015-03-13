@@ -144,16 +144,16 @@ class virtualpage {
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
 		$ListEvent = $this->modx->getCacheManager()->get($key, $cacheOptions);
 		//
-		if (empty($ListEvent) && $this->modx->getCount('mlmEvent') > 0) {
+		if (empty($ListEvent) && $this->modx->getCount('vpEvent') > 0) {
 			$data['active'] = 1;
-/*			$tmp = $this->runProcessor('mgr/settings/event/getlist', $data);
+			$tmp = $this->runProcessor('mgr/settings/event/getlist', $data);
 			if ($response = json_decode($tmp->response, 1)) {
 				foreach ($response['results'] as $v) {
-					if(empty($v['bonuses'])) {continue;}
-					$ListEvent[$v['name']] = $v['bonuses'];
+					if(empty($v['routes'])) {continue;}
+					$ListEvent[$v['name']] = $v['routes'];
 				}
 			}
-			$this->modx->cacheManager->set($key, $ListEvent, 0, $cacheOptions);*/
+			$this->modx->cacheManager->set($key, $ListEvent, 0, $cacheOptions);
 		}
 		//
 		return $ListEvent;
