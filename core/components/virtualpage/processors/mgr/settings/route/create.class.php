@@ -25,6 +25,16 @@ class vpRouteCreateProcessor extends modObjectCreateProcessor {
 		));
 		return parent::beforeSave();
 	}
+	/** {@inheritDoc} */
+	public function afterSave() {
+		$eventId = $this->object->get('event');
+		if($event = $this->modx->getObject('vpEvent', $eventId)) {
+			$eventName = $event->get('name');
+			// set event
+			$this->modx->virtualpage->doEvent('create', $eventName, 'vpEvent', 10);
+		}
 
+		return parent::afterSave();
+	}
 }
 return 'vpRouteCreateProcessor';

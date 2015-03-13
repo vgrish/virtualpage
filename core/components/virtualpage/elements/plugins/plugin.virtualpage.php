@@ -5,5 +5,5 @@ if(!($virtualpage instanceof virtualpage)) {return '';}
 if(!$virtualpage->active) {return '';}
 //
 $eventName = $modx->event->name;
-$listEvent = $virtualpage->getEvents();
+//$listEvent = $virtualpage->getEvents();
 //

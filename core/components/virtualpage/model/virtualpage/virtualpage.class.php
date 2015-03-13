@@ -69,4 +69,60 @@ class virtualpage {
 		return $option;
 	}
 
+	/**
+	 * set/remove Event to Plugin
+	 *
+	 * @param string $action
+	 * @param string $nameEvent
+	 * @param string $namePlugin
+	 * @param int $priority
+	 * @return bool
+	 */
+	public function doEvent($action = 'create', $nameEvent = '', $namePlugin = 'vpEvent', $priority = 0)
+	{
+		if (empty($nameEvent)) return false;
+		if ($plugin = $this->modx->getObject('modPlugin', array('name' => $namePlugin))) {
+			$id = $plugin->get('id');
+			// clear cache
+			$this->clearCache();
+			// create || update
+			if (($action == 'create') || ($action == 'update')) {
+				if (!$event = $this->modx->getObject('modPluginEvent', array('pluginid' => $id, 'event' => $nameEvent))) {
+					$event = $this->modx->newObject('modPluginEvent');
+				}
+				$event->set('pluginid', $id);
+				$event->set('event', $nameEvent);
+				$event->set('priority', $priority);
+				if ($event->save()) {
+					$this->modx->cacheManager->refresh();
+					return true;
+				}
+			}
+			else {
+				//remove
+				if ($event = $this->modx->getObject('modPluginEvent', array('pluginid' => $id, 'event' => $nameEvent))) {
+					if ($event->remove()) {
+						$this->modx->cacheManager->refresh();
+						return true;
+					}
+				}
+			}
+			return true;
+		}
+		$this->modx->log(1, print_r('[virtualpage]:Error get modPlugin - ' . $namePlugin, 1));
+		return false;
+	}
+
+	/**
+	 * clear cache for $key
+	 *
+	 * @param string $key
+	 */
+	public function clearCache($key = 'event')
+	{
+		$cacheKey = $this->config['cache_key'].$key;
+		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
+		$this->modx->cacheManager->clean($cacheOptions);
+	}
+
 }
