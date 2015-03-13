@@ -39,7 +39,10 @@ class virtualpage {
 			'templatesPath' => $corePath . 'elements/templates/',
 			'chunkSuffix' => '.chunk.tpl',
 			'snippetsPath' => $corePath . 'elements/snippets/',
-			'processorsPath' => $corePath . 'processors/'
+			'processorsPath' => $corePath . 'processors/',
+
+			'cache_key' => $this->namespace.'/',
+
 		), $config);
 
 		$this->modx->addPackage('virtualpage', $this->config['modelPath']);
@@ -67,6 +70,22 @@ class virtualpage {
 			}
 		}
 		return $option;
+	}
+
+	/**
+	 * Shorthand for load and run an processor in this component
+	 *
+	 * @param string $action
+	 * @param array $scriptProperties
+	 *
+	 * @return mixed
+	 */
+	function runProcessor($action = '', $scriptProperties = array()) {
+		$this->modx->error->errors = $this->modx->error->message = null;
+		return $this->modx->runProcessor($action, $scriptProperties, array(
+				'processors_path' => $this->config['processorsPath']
+			)
+		);
 	}
 
 	/**
@@ -114,6 +133,33 @@ class virtualpage {
 	}
 
 	/**
+	 * return array() Event
+	 *
+	 * @return mixed
+	 */
+	public function getEvents()
+	{
+		$key = 'event';
+		$cacheKey = $this->config['cache_key'].$key;
+		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
+		$ListEvent = $this->modx->getCacheManager()->get($key, $cacheOptions);
+		//
+		if (empty($ListEvent) && $this->modx->getCount('mlmEvent') > 0) {
+			$data['active'] = 1;
+/*			$tmp = $this->runProcessor('mgr/settings/event/getlist', $data);
+			if ($response = json_decode($tmp->response, 1)) {
+				foreach ($response['results'] as $v) {
+					if(empty($v['bonuses'])) {continue;}
+					$ListEvent[$v['name']] = $v['bonuses'];
+				}
+			}
+			$this->modx->cacheManager->set($key, $ListEvent, 0, $cacheOptions);*/
+		}
+		//
+		return $ListEvent;
+	}
+
+	/**
 	 * clear cache for $key
 	 *
 	 * @param string $key
@@ -123,6 +169,15 @@ class virtualpage {
 		$cacheKey = $this->config['cache_key'].$key;
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
 		$this->modx->cacheManager->clean($cacheOptions);
+	}
+
+	/**
+	 * @param $sp
+	 */
+	public function OnHandleRequest($sp)
+	{
+		// get events
+		$this->getEvents();
 	}
 
 }
