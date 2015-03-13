@@ -47,7 +47,7 @@ virtualpage.grid.Event = function(config) {
         ,plugins: this.exp
         ,columns: [this.exp
             ,{header: _('vp_id'),dataIndex: 'id',width: 50, sortable: true}
-            ,{header: _('vp_name'),dataIndex: 'name',width: 150, editor: {xtype: 'virtualpage-combo-event', allowBlank: false}, sortable: true}
+           // ,{header: _('vp_name'),dataIndex: 'name',width: 150, editor: {xtype: 'virtualpage-combo-event', allowBlank: false}, sortable: true}
             ,{header: _('vp_active'),dataIndex: 'active',sortable:true, width:50, editor:{xtype:'combo-boolean', renderer:'boolean'}}
         ]
         ,tbar: [{
