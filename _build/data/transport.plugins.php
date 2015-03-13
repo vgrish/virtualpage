@@ -2,15 +2,15 @@
 
 $plugins = array();
 
-$tmp = array(/*
-	'virtualpage' => array(
+$tmp = array(
+	'vpEvent' => array(
 		'file' => 'virtualpage',
 		'description' => '',
+		'locked' => 1,
 		'events' => array(
-			'OnManagerPageInit' => array()
+			//'OnManagerPageInit' => array()
 		)
 	)
-	*/
 );
 
 foreach ($tmp as $k => $v) {
