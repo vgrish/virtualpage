@@ -38,7 +38,7 @@ virtualpage.grid.Handler = function(config) {
         ,baseParams: {
             action: 'mgr/settings/handler/getlist'
         }
-        ,fields: ['id', 'name', 'description', 'active']
+        ,fields: ['id', 'name', 'type', 'resource', 'snippet', 'description', 'active']
         ,autoHeight: true
         ,paging: true
         ,remoteSort: true
@@ -47,7 +47,11 @@ virtualpage.grid.Handler = function(config) {
         ,plugins: this.exp
         ,columns: [this.exp
             ,{header: _('vp_id'),dataIndex: 'id',width: 50, sortable: true}
-           // ,{header: _('vp_name'),dataIndex: 'name',width: 150, editor: {xtype: 'virtualpage-combo-plugin-handler', allowBlank: false}, sortable: true}
+            ,{header: _('vp_name'),dataIndex: 'name',width: 50, editor: {xtype: 'textfield', allowBlank: false}, sortable: true}
+            ,{header: _('vp_type'),dataIndex: 'type',width: 50, sortable: true}
+            ,{header: _('vp_resource'),dataIndex: 'resource',width: 50, sortable: true}
+            ,{header: _('vp_snippet'),dataIndex: 'snippet',width: 50, sortable: true}
+
             ,{header: _('vp_active'),dataIndex: 'active',sortable:true, width:50, editor:{xtype:'combo-boolean', renderer:'boolean'}}
         ]
         ,tbar: [{

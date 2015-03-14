@@ -39,6 +39,10 @@ $_lang['vp_metod'] = 'Метод';
 $_lang['vp_metod_get'] = 'GET';
 $_lang['vp_metod_post'] = 'POST';
 
+$_lang['vp_type'] = 'Тип';
+$_lang['vp_resource'] = 'Ресурс';
+$_lang['vp_snippet'] = 'Сниппет';
+
 
 $_lang['vp_all'] = 'Все';
 $_lang['vp_empty'] = 'Нет';

@@ -89,5 +89,13 @@ $xpdo_meta_map['vpRoute']= array (
       'owner' => 'foreign',
       'cardinality' => 'one',
     ),
+    'Handler' => 
+    array (
+      'class' => 'vpHandler',
+      'local' => 'handler',
+      'foreign' => 'id',
+      'owner' => 'foreign',
+      'cardinality' => 'one',
+    ),
   ),
 );

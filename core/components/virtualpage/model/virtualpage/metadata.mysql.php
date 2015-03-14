@@ -5,5 +5,6 @@ $xpdo_meta_map = array (
   array (
     0 => 'vpRoute',
     1 => 'vpEvent',
+    2 => 'vpHandler',
   ),
 );
