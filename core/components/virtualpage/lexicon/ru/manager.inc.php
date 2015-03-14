@@ -43,6 +43,8 @@ $_lang['vp_type'] = 'Тип';
 $_lang['vp_resource'] = 'Ресурс';
 $_lang['vp_snippet'] = 'Сниппет';
 
+$_lang['vp_type_resource'] = 'Ресурс';
+$_lang['vp_type_snippet'] = 'Сниппет';
 
 $_lang['vp_all'] = 'Все';
 $_lang['vp_empty'] = 'Нет';

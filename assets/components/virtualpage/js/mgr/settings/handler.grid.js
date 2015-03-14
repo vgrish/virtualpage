@@ -137,7 +137,7 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
 
         fields.push(
             {xtype: 'hidden',name: 'id', id: 'virtualpage-handler-id-'+type}
-            ,{xtype: 'virtualpage-combo-plugin-handler',fieldLabel: _('vp_name'), name: 'name', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-name-'+type}
+            ,{xtype: 'virtualpage-combo-type',fieldLabel: _('vp_type'), name: 'type', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-type-'+type}
             ,{xtype: 'textarea', fieldLabel: _('vp_description'), name: 'description', anchor: '99%', id: 'virtualpage-handler-description-'+type}
         );
 

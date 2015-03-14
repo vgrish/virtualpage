@@ -96,3 +96,25 @@ virtualpage.combo.Metod = function(config) {
 };
 Ext.extend(virtualpage.combo.Metod,MODx.combo.ComboBox);
 Ext.reg('virtualpage-combo-metod',virtualpage.combo.Metod);
+
+virtualpage.combo.Type = function(config) {
+    config = config || {};
+    Ext.applyIf(config,{
+        store: new Ext.data.ArrayStore({
+            id: 0
+            ,fields: ['type','display']
+            ,data: [
+                [0,_('vp_type_resource')],
+                [1,_('vp_type_snippet')]
+            ]
+        })
+        ,mode: 'local'
+        ,displayField: 'display'
+        ,valueField: 'type'
+        ,hiddenName: 'type'
+
+    });
+    virtualpage.combo.Type.superclass.constructor.call(this,config);
+};
+Ext.extend(virtualpage.combo.Type,MODx.combo.ComboBox);
+Ext.reg('virtualpage-combo-type',virtualpage.combo.Type);
