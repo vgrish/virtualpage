@@ -1,6 +1,6 @@
 <?php
 
-class modResourceGetListProcessor extends modObjectGetListProcessor {
+class modSnippetGetListProcessor extends modObjectGetListProcessor {
 	public $classKey = 'modSnippet';
 	public $languageTopics = array('snippet','category');
 	public $defaultSortField = 'name';
@@ -29,4 +29,4 @@ class modResourceGetListProcessor extends modObjectGetListProcessor {
 		return $array;
 	}
 }
-return 'modResourceGetListProcessor';
+return 'modSnippetGetListProcessor';

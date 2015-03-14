@@ -4,7 +4,7 @@ virtualpage
 Author: Vgrish <vgrish@gmail.com>
 --------------------
 
-A basic Extra for MODx Revolution.
+Virtual page for MODx Revolution.
 
 Feel free to suggest ideas/improvements/bugs on GitHub:
-http://github.com/username/virtualpage/issues
+https://github.com/vgrish/virtualpage/issues
