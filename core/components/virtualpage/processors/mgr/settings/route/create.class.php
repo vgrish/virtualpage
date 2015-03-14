@@ -13,8 +13,8 @@ class vpRouteCreateProcessor extends modObjectCreateProcessor {
 	}
 	/** {@inheritDoc} */
 	public function beforeSet() {
-		if ($this->modx->getObject('vpRoute',array('name' => $this->getProperty('name')))) {
-			$this->modx->error->addField('name', $this->modx->lexicon('vp_err_ae'));
+		if ($this->modx->getObject('vpRoute',array('route' => $this->getProperty('route')))) {
+			$this->modx->error->addField('route', $this->modx->lexicon('vp_err_ae'));
 		}
 		return !$this->hasErrors();
 	}
