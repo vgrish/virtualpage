@@ -3,10 +3,12 @@
 	   version="1.1">
 
 	<object class="vpRoute" table="vp_routes" extends="xPDOSimpleObject">
-		<field key="name" dbtype="varchar" precision="255" phptype="string" null="false" />
-		<field key="description" dbtype="text" phptype="string" null="true" />
-		<field key="event" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+		<field key="http_method" dbtype="varchar" precision="255" phptype="string" null="false" />
+		<field key="route" dbtype="varchar" precision="255" phptype="string" null="false" />
+		<field key="handler" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
 
+		<field key="event" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+		<field key="description" dbtype="text" phptype="string" null="true" />
 		<field key="rank" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="true" default="0" />
 		<field key="active" dbtype="tinyint" precision="1" phptype="integer" null="true" default="1" />
 		<field key="properties" dbtype="text" phptype="json" null="true" />
@@ -20,7 +22,6 @@
 		<field key="description" dbtype="text" phptype="string" null="true" />
 		<field key="rank" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="true" default="0" />
 		<field key="active" dbtype="tinyint" precision="1" phptype="integer" null="true" default="1" />
-		<field key="properties" dbtype="text" phptype="json" null="true" />
 
 		<composite alias="Routes" class="vpRoute" local="id" foreign="event" owner="local" cardinality="many" />
 

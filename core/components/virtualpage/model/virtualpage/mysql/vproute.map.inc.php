@@ -6,27 +6,39 @@ $xpdo_meta_map['vpRoute']= array (
   'extends' => 'xPDOSimpleObject',
   'fields' => 
   array (
-    'name' => NULL,
-    'description' => NULL,
+    'http_method' => NULL,
+    'route' => NULL,
+    'handler' => 0,
     'event' => 0,
+    'description' => NULL,
     'rank' => 0,
     'active' => 1,
     'properties' => NULL,
   ),
   'fieldMeta' => 
   array (
-    'name' => 
+    'http_method' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',
       'phptype' => 'string',
       'null' => false,
     ),
-    'description' => 
+    'route' => 
     array (
-      'dbtype' => 'text',
+      'dbtype' => 'varchar',
+      'precision' => '255',
       'phptype' => 'string',
-      'null' => true,
+      'null' => false,
+    ),
+    'handler' => 
+    array (
+      'dbtype' => 'int',
+      'precision' => '10',
+      'attributes' => 'unsigned',
+      'phptype' => 'integer',
+      'null' => false,
+      'default' => 0,
     ),
     'event' => 
     array (
@@ -36,6 +48,12 @@ $xpdo_meta_map['vpRoute']= array (
       'phptype' => 'integer',
       'null' => false,
       'default' => 0,
+    ),
+    'description' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'string',
+      'null' => true,
     ),
     'rank' => 
     array (

@@ -30,9 +30,9 @@ virtualpage.panel.Settings = function(config) {
             , hideMode: 'offsets'
 
             , items: [{
-                title: _('vp_route')
+                title: _('vp_routes')
                 , items: [{
-                    html: '<p>' + _('vp_route_intro') + '</p>'
+                    html: '<p>' + _('vp_routes_intro') + '</p>'
                     , border: false
                     , bodyCssClass: 'panel-desc'
                     , bodyStyle: 'margin-bottom: 10px'
@@ -40,9 +40,9 @@ virtualpage.panel.Settings = function(config) {
                     xtype: 'virtualpage-grid-route'
                 }]
             },{
-                title: _('vp_event')
+                title: _('vp_events')
                 , items: [{
-                    html: '<p>' + _('vp_event_intro') + '</p>'
+                    html: '<p>' + _('vp_events_intro') + '</p>'
                     , border: false
                     , bodyCssClass: 'panel-desc'
                     , bodyStyle: 'margin-bottom: 10px'

@@ -10,7 +10,6 @@ $xpdo_meta_map['vpEvent']= array (
     'description' => NULL,
     'rank' => 0,
     'active' => 1,
-    'properties' => NULL,
   ),
   'fieldMeta' => 
   array (
@@ -43,12 +42,6 @@ $xpdo_meta_map['vpEvent']= array (
       'phptype' => 'integer',
       'null' => true,
       'default' => 1,
-    ),
-    'properties' => 
-    array (
-      'dbtype' => 'text',
-      'phptype' => 'json',
-      'null' => true,
     ),
   ),
   'composites' => 
