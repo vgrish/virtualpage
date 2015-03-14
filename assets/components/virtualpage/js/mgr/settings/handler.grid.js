@@ -104,16 +104,23 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
         if (!this.menu.record || !this.menu.record.id) return false;
         var r = this.menu.record;
 
-        if (!this.windows.updateHandler) {
-            this.windows.updateHandler = MODx.load({
-                xtype: 'virtualpage-window-handler-update'
-                ,record: r
-                ,fields: this.getHandlerFields('update')
-                ,listeners: {
-                    success: {fn:function() { this.refresh(); },scope:this}
-                }
-            });
+        console.log(r);
+
+        if (this.windows.updateHandler) {
+            try {
+                this.windows.updateHandler.close();
+                this.windows.updateHandler.destroy();
+            } catch (e) {}
         }
+        this.windows.updateHandler = MODx.load({
+            xtype: 'virtualpage-window-handler-update'
+            ,record: r
+            ,fields: this.getHandlerFields('update')
+            ,listeners: {
+                success: {fn:function() { this.refresh(); },scope:this}
+            }
+        });
+
         this.windows.updateHandler.fp.getForm().reset();
         this.windows.updateHandler.fp.getForm().setValues(r);
         this.windows.updateHandler.show(e.target);
@@ -136,11 +143,15 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
         });
     }
 
-    ,handleChangeType: function(type) {
+    ,handleChangeType: function(type, change) {
         var el = Ext.getCmp('virtualpage-handler-type-'+type);
         var entry = Ext.getCmp('virtualpage-handler-entry-'+type);
 
-        entry.reset();
+        if(type !== 'update') {entry.reset();}
+        if((change == 1) || (change == '1')) {
+            entry.clearValue();
+            entry.reset();
+        }
 
         switch (el.value) {
             case 0:
@@ -167,8 +178,8 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
             ,{xtype: 'textfield',fieldLabel: _('vp_name'), name: 'name', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-name-'+type}
             ,{xtype: 'virtualpage-combo-type',fieldLabel: _('vp_type'), name: 'type', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-type-'+type
                 ,listeners: {
-                    afterrender: {fn: function(r) { this.handleChangeType(type);},scope:this }
-                    ,select: {fn: function(r) { this.handleChangeType(type);},scope:this }
+                    afterrender: {fn: function(r) { this.handleChangeType(type, 0);},scope:this }
+                    ,select: {fn: function(r) { this.handleChangeType(type, 1);},scope:this }
                 }
             }
             ,{xtype: 'virtualpage-combo-entry',fieldLabel: _('vp_entry'), name: 'entry', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-entry-'+type}
