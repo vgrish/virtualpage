@@ -6,5 +6,14 @@ if(!$virtualpage->active) {return '';}
 if(isset($_REQUEST['vp_die'])) {return '';}
 //
 $eventName = $modx->event->name;
-//$listEvent = $virtualpage->getEvents();
+$listEvent = $virtualpage->getEvents();
 //
+if(!is_array($listEvent) || (empty($listEvent))) {return '';}
+if(in_array($eventName, array_keys($listEvent))) {
+	$virtualpage->doRoutes(array_merge($scriptProperties,
+		array(
+			'eventName' => $eventName,
+			'routes' => $listEvent[$eventName],
+		)
+	));
+}

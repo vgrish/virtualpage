@@ -88,6 +88,31 @@ class virtualpage {
 		);
 	}
 
+	public function doRoutes($sp = array())
+	{
+		$eventName = $sp['eventName'];
+		$routes = $sp['routes'];
+
+
+		$this->modx->log(1, print_r('зашли в - '.$eventName, 1));
+
+		if (empty($routes)) {
+			$this->modx->log(1, print_r('[vp]:Error empty routes for event - ' . $eventName, 1));
+			return false;
+		}
+
+		//
+		foreach($routes as $n => $v) {
+
+			$this->modx->log(1 , print_r('i- '. $n  ,1));
+
+
+			if(!$route = $this->modx->getObject('vpRoute', array('id' => $n, 'active' => 1))) {continue;}
+
+		}
+		return true;
+	}
+
 	/**
 	 * set/remove Event to Plugin
 	 *

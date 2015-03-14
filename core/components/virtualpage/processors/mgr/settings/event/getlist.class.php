@@ -25,10 +25,12 @@ class vpEventGetListProcessor extends modObjectGetListProcessor {
 	/** {@inheritDoc} */
 	public function prepareRow(xPDOObject $object) {
 		$array = $object->toArray();
+
 		$routes = $object->getMany('Routes');
 		$enabled = array();
 
 		foreach ($routes as $route) {
+			if($route->active == 0) {continue;}
 			$enabled[$route->id] = 1;
 		}
 		$array['routes'] = $enabled;

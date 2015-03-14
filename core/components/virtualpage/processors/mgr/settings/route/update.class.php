@@ -25,6 +25,12 @@ class vpRouteUpdateProcessor extends modObjectUpdateProcessor {
 
 		return parent::beforeSet();
 	}
+	/** {@inheritDoc} */
+	public function afterSave() {
+		$this->modx->virtualpage->clearCache();
+
+		return parent::afterSave();
+	}
 
 }
 return 'vpRouteUpdateProcessor';
