@@ -3,6 +3,9 @@
 /**
  * The base class for virtualpage.
  */
+
+include_once dirname(dirname(__FILE__)) . '/lib/fastroute/src/bootstrap.php';
+
 class virtualpage {
 	/* @var modX $modx */
 	public $modx;
@@ -97,7 +100,7 @@ class virtualpage {
 		$this->modx->log(1, print_r('зашли в - '.$eventName, 1));
 
 		if (empty($routes)) {
-			$this->modx->log(1, print_r('[vp]:Error empty routes for event - ' . $eventName, 1));
+			$this->modx->log(1, print_r('[virtualpage]:Error empty routes for event - ' . $eventName, 1));
 			return false;
 		}
 
