@@ -103,9 +103,6 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
     ,updateHandler: function(btn,e) {
         if (!this.menu.record || !this.menu.record.id) return false;
         var r = this.menu.record;
-
-        console.log(r);
-
         if (this.windows.updateHandler) {
             try {
                 this.windows.updateHandler.close();
