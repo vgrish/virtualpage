@@ -49,6 +49,16 @@ virtualpage.panel.Settings = function(config) {
                 }, {
                     xtype: 'virtualpage-grid-event'
                 }]
+            },{
+                title: _('vp_handlers')
+                , items: [{
+                    html: '<p>' + _('vp_handlers_intro') + '</p>'
+                    , border: false
+                    , bodyCssClass: 'panel-desc'
+                    , bodyStyle: 'margin-bottom: 10px'
+                }, {
+                    xtype: 'virtualpage-grid-handler'
+                }]
             }
 
 
