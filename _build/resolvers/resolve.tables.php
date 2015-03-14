@@ -13,6 +13,7 @@ if ($object->xpdo) {
 			$objects = array(
 				'vpEvent',
 				'vpRoute',
+				'vpHandler',
 			);
 			foreach ($objects as $tmp) {
 				$manager->createObjectContainer($tmp);
