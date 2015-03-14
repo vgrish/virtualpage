@@ -33,6 +33,7 @@ $_lang['vp_count'] = 'Количество';
 
 $_lang['vp_route'] = 'Маршрут';
 $_lang['vp_event'] = 'Событие';
+$_lang['vp_handler'] = 'Обработчик';
 
 $_lang['vp_metod'] = 'Метод';
 $_lang['vp_metod_get'] = 'GET';

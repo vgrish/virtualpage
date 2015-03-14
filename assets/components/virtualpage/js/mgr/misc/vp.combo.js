@@ -50,6 +50,31 @@ Ext.extend(virtualpage.combo.Event, MODx.combo.ComboBox);
 Ext.reg('virtualpage-combo-event', virtualpage.combo.Event);
 
 
+virtualpage.combo.Handler = function(config) {
+    config = config || {};
+    Ext.applyIf(config, {
+        name: 'handler'
+        , hiddenName: 'handler'
+        , displayField: 'name'
+        , valueField: 'id'
+        , editable: true
+        , fields: ['name','id']
+        , pageSize: 10
+        , emptyText: _('vp_combo_select')
+        , hideMode: 'offsets'
+        , url: virtualpage.config.connector_url
+        , baseParams: {
+            action: 'mgr/settings/handler/getlist',
+            combo: true,
+            limit: 0
+        }
+    });
+    virtualpage.combo.Handler.superclass.constructor.call(this, config);
+};
+Ext.extend(virtualpage.combo.Handler, MODx.combo.ComboBox);
+Ext.reg('virtualpage-combo-handler', virtualpage.combo.Handler);
+
+
 virtualpage.combo.Metod = function(config) {
     config = config || {};
     Ext.applyIf(config,{
