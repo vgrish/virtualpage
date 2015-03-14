@@ -93,6 +93,10 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
             });
         }
         this.windows.createHandler.fp.getForm().reset();
+        this.windows.createHandler.fp.getForm().setValues({
+            type: 0
+            ,active: 1
+        });
         this.windows.createHandler.show(e.target);
     }
 
@@ -132,13 +136,49 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
         });
     }
 
+    ,handleChangeType: function(type) {
+        var el = Ext.getCmp('virtualpage-handler-type-'+type);
+        var resource = Ext.getCmp('virtualpage-handler-resource-'+type);
+        var snippet = Ext.getCmp('virtualpage-handler-snippet-'+type);
+
+        switch (el.value) {
+            case 0:
+            case '0': {
+                resource.allowBlank = false;
+                resource.enable().show();
+
+                snippet.allowBlank = true;
+                snippet.hide().disable();
+
+                break;
+            }
+            case 1:
+            case '1': {
+                snippet.allowBlank = false;
+                snippet.enable().show();
+
+                resource.allowBlank = true;
+                resource.hide().disable();
+
+                break;
+            }
+        }
+    }
+
     ,getHandlerFields: function(type) {
         var fields = [];
 
         fields.push(
             {xtype: 'hidden',name: 'id', id: 'virtualpage-handler-id-'+type}
             ,{xtype: 'textfield',fieldLabel: _('vp_name'), name: 'name', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-name-'+type}
-            ,{xtype: 'virtualpage-combo-type',fieldLabel: _('vp_type'), name: 'type', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-type-'+type}
+            ,{xtype: 'virtualpage-combo-type',fieldLabel: _('vp_type'), name: 'type', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-type-'+type
+
+                ,listeners: {
+                    afterrender: {fn: function(r) { this.handleChangeType(type);},scope:this }
+                    ,select: {fn: function(r) { this.handleChangeType(type);},scope:this }
+                }
+
+            }
 
             ,{xtype: 'virtualpage-combo-resource',fieldLabel: _('vp_resource'), name: 'resource', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-resource-'+type}
             ,{xtype: 'virtualpage-combo-snippet',fieldLabel: _('vp_snippet'), name: 'snippet', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-snippet-'+type}

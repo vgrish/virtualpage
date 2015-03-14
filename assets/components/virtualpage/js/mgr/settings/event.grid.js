@@ -89,6 +89,9 @@ Ext.extend(virtualpage.grid.Event,MODx.grid.Grid,{
             });
         }
         this.windows.createEvent.fp.getForm().reset();
+        this.windows.createEvent.fp.getForm().setValues({
+            active: 1
+        });
         this.windows.createEvent.show(e.target);
     }
 
