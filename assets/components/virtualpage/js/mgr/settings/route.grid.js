@@ -38,7 +38,7 @@ virtualpage.grid.Route = function(config) {
         ,baseParams: {
             action: 'mgr/settings/route/getlist'
         }
-        ,fields: ['id', 'method', 'description', 'active', 'event']
+        ,fields: ['id', 'metod', 'route', 'description', 'active', 'event']
         ,autoHeight: true
         ,paging: true
         ,remoteSort: true
@@ -48,7 +48,7 @@ virtualpage.grid.Route = function(config) {
         ,plugins: this.exp
         ,columns: [this.exp
             ,{header: _('vp_id'),dataIndex: 'id',width: 50, sortable: true}
-            ,{header: _('vp_method'),dataIndex: 'method',width: 150, editor: {xtype: 'virtualpage-combo-method', allowBlank: false}, sortable: true}
+            ,{header: _('vp_metod'),dataIndex: 'metod',width: 150, editor: {xtype: 'virtualpage-combo-metod', allowBlank: false}, sortable: true}
             ,{header: _('vp_route'),dataIndex: 'route',width: 150, editor: {xtype: 'textfield', allowBlank: false}, sortable: true}
 
             ,{header: _('vp_event'),dataIndex: 'event', width: 150, editor: {xtype: 'virtualpage-combo-event', allowBlank: false}, sortable: true, renderer: virtualpage.utils.renderEvent}
@@ -144,7 +144,7 @@ Ext.extend(virtualpage.grid.Route,MODx.grid.Grid,{
 
         fields.push(
             {xtype: 'hidden',name: 'id', id: 'virtualpage-route-id-'+type}
-            ,{xtype: 'virtualpage-combo-method',fieldLabel: _('vp_method'), name: 'method', allowBlank: false, anchor: '99%', id: 'virtualpage-route-method-'+type}
+            ,{xtype: 'virtualpage-combo-metod',fieldLabel: _('vp_metod'), name: 'metod', allowBlank: false, anchor: '99%', id: 'virtualpage-route-metod-'+type}
             ,{xtype: 'textfield',fieldLabel: _('vp_route'), name: 'route', allowBlank: false, anchor: '99%', id: 'virtualpage-route-route-'+type}
 
             ,{xtype: 'virtualpage-combo-event',fieldLabel: _('vp_event'), name: 'event', allowBlank: false, anchor: '99%', id: 'virtualpage-route-event-'+type}

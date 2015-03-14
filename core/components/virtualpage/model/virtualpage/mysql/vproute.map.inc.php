@@ -6,7 +6,7 @@ $xpdo_meta_map['vpRoute']= array (
   'extends' => 'xPDOSimpleObject',
   'fields' => 
   array (
-    'method' => NULL,
+    'metod' => NULL,
     'route' => NULL,
     'handler' => 0,
     'event' => 0,
@@ -17,7 +17,7 @@ $xpdo_meta_map['vpRoute']= array (
   ),
   'fieldMeta' => 
   array (
-    'method' => 
+    'metod' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '255',

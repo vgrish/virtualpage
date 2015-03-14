@@ -3,7 +3,7 @@
 	   version="1.1">
 
 	<object class="vpRoute" table="vp_routes" extends="xPDOSimpleObject">
-		<field key="method" dbtype="varchar" precision="255" phptype="string" null="false" />
+		<field key="metod" dbtype="varchar" precision="255" phptype="string" null="false" />
 		<field key="route" dbtype="varchar" precision="255" phptype="string" null="false" />
 		<field key="handler" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
 

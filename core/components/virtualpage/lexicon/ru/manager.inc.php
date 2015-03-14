@@ -34,9 +34,9 @@ $_lang['vp_count'] = 'Количество';
 $_lang['vp_route'] = 'Маршрут';
 $_lang['vp_event'] = 'Событие';
 
-$_lang['vp_method'] = 'Метод';
-$_lang['vp_method_get'] = 'GET';
-$_lang['vp_method_post'] = 'POST';
+$_lang['vp_metod'] = 'Метод';
+$_lang['vp_metod_get'] = 'GET';
+$_lang['vp_metod_post'] = 'POST';
 
 
 $_lang['vp_all'] = 'Все';

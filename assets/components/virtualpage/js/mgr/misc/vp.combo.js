@@ -50,24 +50,24 @@ Ext.extend(virtualpage.combo.Event, MODx.combo.ComboBox);
 Ext.reg('virtualpage-combo-event', virtualpage.combo.Event);
 
 
-virtualpage.combo.Method = function(config) {
+virtualpage.combo.Metod = function(config) {
     config = config || {};
     Ext.applyIf(config,{
         store: new Ext.data.ArrayStore({
             id: 0
-            ,fields: ['method','display']
+            ,fields: ['metod','display']
             ,data: [
-                ['GET',_('vp_method_get')],
-                ['POST',_('vp_method_post')]
+                ['GET',_('vp_metod_get')],
+                ['POST',_('vp_metod_post')]
             ]
         })
         ,mode: 'local'
         ,displayField: 'display'
-        ,valueField: 'method'
-        ,hiddenName: 'method'
+        ,valueField: 'metod'
+        ,hiddenName: 'metod'
 
     });
-    virtualpage.combo.Method.superclass.constructor.call(this,config);
+    virtualpage.combo.Metod.superclass.constructor.call(this,config);
 };
-Ext.extend(virtualpage.combo.Method,MODx.combo.ComboBox);
-Ext.reg('virtualpage-combo-method',virtualpage.combo.Method);
+Ext.extend(virtualpage.combo.Metod,MODx.combo.ComboBox);
+Ext.reg('virtualpage-combo-metod',virtualpage.combo.Metod);
