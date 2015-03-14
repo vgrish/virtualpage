@@ -120,35 +120,11 @@ Ext.extend(virtualpage.combo.Type,MODx.combo.ComboBox);
 Ext.reg('virtualpage-combo-type',virtualpage.combo.Type);
 
 
-virtualpage.combo.Resource = function(config) {
+virtualpage.combo.Entry = function(config) {
     config = config || {};
     Ext.applyIf(config,{
-        name: 'resource'
-        ,hiddenName: 'resource'
-        ,displayField: 'pagetitle'
-        ,valueField: 'id'
-        ,editable: true
-        ,fields: ['id','pagetitle']
-        ,pageSize: 20
-        ,emptyText: _('vp_combo_select')
-        ,hideMode: 'offsets'
-        ,url: virtualpage.config.connector_url
-        ,baseParams: {
-            action: 'mgr/misc/resource/getlist'
-            ,combo: true
-        }
-    });
-    virtualpage.combo.Resource.superclass.constructor.call(this,config);
-};
-Ext.extend(virtualpage.combo.Resource,MODx.combo.ComboBox);
-Ext.reg('virtualpage-combo-resource',virtualpage.combo.Resource);
-
-
-virtualpage.combo.Snippet = function(config) {
-    config = config || {};
-    Ext.applyIf(config,{
-        name: 'snippet'
-        ,hiddenName: 'snippet'
+        name: 'entry'
+        ,hiddenName: 'entry'
         ,displayField: 'name'
         ,valueField: 'id'
         ,editable: true
@@ -158,11 +134,12 @@ virtualpage.combo.Snippet = function(config) {
         ,hideMode: 'offsets'
         ,url: virtualpage.config.connector_url
         ,baseParams: {
-            action: 'mgr/misc/snippet/getlist'
+            action: 'mgr/misc/entry/getlist'
+            ,element: 'resource'
             ,combo: true
         }
     });
-    virtualpage.combo.Snippet.superclass.constructor.call(this,config);
+    virtualpage.combo.Entry.superclass.constructor.call(this,config);
 };
-Ext.extend(virtualpage.combo.Snippet,MODx.combo.ComboBox);
-Ext.reg('virtualpage-combo-snippet',virtualpage.combo.Snippet);
+Ext.extend(virtualpage.combo.Entry,MODx.combo.ComboBox);
+Ext.reg('virtualpage-combo-entry',virtualpage.combo.Entry);

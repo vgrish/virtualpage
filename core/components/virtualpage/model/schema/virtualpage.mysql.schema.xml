@@ -31,8 +31,7 @@
 	<object class="vpHandler" table="vp_handlers" extends="xPDOSimpleObject">
 		<field key="name" dbtype="varchar" precision="255" phptype="string" null="false" />
 		<field key="type" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
-		<field key="resource" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
-		<field key="snippet" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
+		<field key="entry" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
 
 		<field key="description" dbtype="text" phptype="string" null="true" />
 		<field key="rank" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="true" default="0" />

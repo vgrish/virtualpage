@@ -5,6 +5,14 @@ virtualpage.utils.renderBoolean = function (value, props, row) {
 		: String.format('<span class="red">{0}</span>', _('no'));
 }
 
+virtualpage.utils.renderType = function (value, props, row) {
+
+	console.log(value);
+
+	return value
+		? String.format('<span class="green">{0}</span>', _('vp_type_snippet'))
+		: String.format('<span class="red">{0}</span>', _('vp_type_resource'));
+}
 
 virtualpage.utils.renderEvent = function (value, props, row) {
 	return row.json.event_name

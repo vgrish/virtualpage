@@ -38,7 +38,7 @@ virtualpage.grid.Handler = function(config) {
         ,baseParams: {
             action: 'mgr/settings/handler/getlist'
         }
-        ,fields: ['id', 'name', 'type', 'resource', 'snippet', 'description', 'active']
+        ,fields: ['id', 'name', 'type', 'entry', 'description', 'active']
         ,autoHeight: true
         ,paging: true
         ,remoteSort: true
@@ -48,9 +48,9 @@ virtualpage.grid.Handler = function(config) {
         ,columns: [this.exp
             ,{header: _('vp_id'),dataIndex: 'id',width: 50, sortable: true}
             ,{header: _('vp_name'),dataIndex: 'name',width: 50, editor: {xtype: 'textfield', allowBlank: false}, sortable: true}
-            ,{header: _('vp_type'),dataIndex: 'type',width: 50, sortable: true}
-            ,{header: _('vp_resource'),dataIndex: 'resource',width: 50, sortable: true}
-            ,{header: _('vp_snippet'),dataIndex: 'snippet',width: 50, sortable: true}
+            ,{header: _('vp_type'),dataIndex: 'type',width:50, editor: {xtype:'virtualpage-combo-type', allowBlank: false}, sortable: true, renderer: virtualpage.utils.renderType}
+
+            ,{header: _('vp_entry'),dataIndex: 'entry',width: 50, sortable: true}
 
             ,{header: _('vp_active'),dataIndex: 'active',sortable:true, width:50, editor:{xtype:'combo-boolean', renderer:'boolean'}}
         ]
@@ -138,31 +138,25 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
 
     ,handleChangeType: function(type) {
         var el = Ext.getCmp('virtualpage-handler-type-'+type);
-        var resource = Ext.getCmp('virtualpage-handler-resource-'+type);
-        var snippet = Ext.getCmp('virtualpage-handler-snippet-'+type);
+        var entry = Ext.getCmp('virtualpage-handler-entry-'+type);
+
+        entry.reset();
 
         switch (el.value) {
             case 0:
             case '0': {
-                resource.allowBlank = false;
-                resource.enable().show();
-
-                snippet.allowBlank = true;
-                snippet.hide().disable();
-
+                entry.baseParams.element = 'resource';
                 break;
             }
             case 1:
             case '1': {
-                snippet.allowBlank = false;
-                snippet.enable().show();
-
-                resource.allowBlank = true;
-                resource.hide().disable();
+                entry.baseParams.element = 'snippet';
 
                 break;
             }
         }
+        entry.store.load();
+
     }
 
     ,getHandlerFields: function(type) {
@@ -172,17 +166,12 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
             {xtype: 'hidden',name: 'id', id: 'virtualpage-handler-id-'+type}
             ,{xtype: 'textfield',fieldLabel: _('vp_name'), name: 'name', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-name-'+type}
             ,{xtype: 'virtualpage-combo-type',fieldLabel: _('vp_type'), name: 'type', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-type-'+type
-
                 ,listeners: {
                     afterrender: {fn: function(r) { this.handleChangeType(type);},scope:this }
                     ,select: {fn: function(r) { this.handleChangeType(type);},scope:this }
                 }
-
             }
-
-            ,{xtype: 'virtualpage-combo-resource',fieldLabel: _('vp_resource'), name: 'resource', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-resource-'+type}
-            ,{xtype: 'virtualpage-combo-snippet',fieldLabel: _('vp_snippet'), name: 'snippet', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-snippet-'+type}
-
+            ,{xtype: 'virtualpage-combo-entry',fieldLabel: _('vp_entry'), name: 'entry', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-entry-'+type}
             ,{xtype: 'textarea', fieldLabel: _('vp_description'), name: 'description', anchor: '99%', id: 'virtualpage-handler-description-'+type}
         );
 
