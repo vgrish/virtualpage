@@ -143,6 +143,8 @@ Ext.extend(virtualpage.grid.Route,MODx.grid.Grid,{
 
         fields.push(
             {xtype: 'hidden',name: 'id', id: 'virtualpage-route-id-'+type}
+            ,{xtype: 'virtualpage-combo-http-method',fieldLabel: _('vp_http_method'), name: 'http_method', allowBlank: false, anchor: '99%', id: 'virtualpage-route-http_method-'+type}
+
             ,{xtype: 'textfield',fieldLabel: _('vp_name'), name: 'name', allowBlank: false, anchor: '99%', id: 'virtualpage-route-name-'+type}
 
             ,{xtype: 'virtualpage-combo-event',fieldLabel: _('vp_event'), name: 'event', allowBlank: false, anchor: '99%', id: 'virtualpage-route-event-'+type}

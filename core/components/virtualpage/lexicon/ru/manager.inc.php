@@ -30,6 +30,11 @@ $_lang['vp_num'] = 'Номер';
 $_lang['vp_status'] = 'Статус';
 $_lang['vp_count'] = 'Количество';
 
+$_lang['vp_http_method'] = 'Http метод';
+$_lang['vp_http_method_get'] = 'GET';
+$_lang['vp_http_method_post'] = 'POST';
+
+
 $_lang['vp_all'] = 'Все';
 $_lang['vp_empty'] = 'Нет';
 
