@@ -136,15 +136,42 @@ class virtualpage {
 	 * @return null
 	 */
 	public function handle($id, array $data) {
-
-		$this->modx->log(1 , print_r('handle' ,1));
-		
+		if(!$handler = $this->modx->getObject('vpHandler', array('id' => $id, 'active' => 1))) {
+			return $this->error();
+		}
+		$_REQUEST += array($this->fastrouterKey => $data);
+		//
+		$type = $handler->get('type');
+		$entry = $handler->get('entry');
+		switch ($type) {
+			case 0:
+				$this->modx->setPlaceholders($data, 'vp.');
+				$this->modx->sendForward($entry);
+				break;
+			case 1:
+				if ($snippet = $this->modx->getObject('modSnippet', $entry)) {
+					$snippet->_cacheable = false;
+					$snippet->_processed = false;
+					//
+					$properties = $snippet->getProperties();
+					$properties = array_merge($properties, $_REQUEST);
+					//
+					$output = $snippet->process($properties);
+					if (strpos($output, '[[') !== false) {
+						$maxIterations= intval($this->modx->getOption('parser_max_iterations', $options, 10));
+						$this->modx->parser->processElementTags('', $output, true, false, '[[', ']]', array(), $maxIterations);
+						$this->modx->parser->processElementTags('', $output, true, true, '[[', ']]', array(), $maxIterations);
+					}
+					exit($output);
+				}
+				break;
+			default:
+				return $this->error();
+				break;
+		}
 
 		return '';
 	}
-
-
-
 
 	/**
 	 * @param $ids
