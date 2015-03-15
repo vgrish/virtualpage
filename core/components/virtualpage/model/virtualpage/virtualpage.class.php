@@ -17,6 +17,13 @@ class virtualpage {
 	public $config = array();
 	public $active = false;
 
+	public $event;
+	public $routes;
+	public $dispatcher;
+
+	public $fastrouterKey;
+
+
 	/**
 	 * @param modX $modx
 	 * @param array $config
@@ -45,6 +52,7 @@ class virtualpage {
 			'processorsPath' => $corePath . 'processors/',
 
 			'cache_key' => $this->namespace.'/',
+			'fastrouter_cache_key' => 'fastrouter',
 
 		), $config);
 
@@ -52,6 +60,7 @@ class virtualpage {
 		$this->modx->lexicon->load('virtualpage:default');
 
 		$this->active = $this->modx->getOption('virtualpage_active', $config, false);
+		$this->fastrouterKey = $this->modx->getOption('virtualpage_fastrouter_key', null, 'fastrouter');
 
 	}
 
@@ -91,29 +100,133 @@ class virtualpage {
 		);
 	}
 
+	/**
+	 * @param array $sp
+	 * @return bool|null
+	 */
 	public function doRoutes($sp = array())
 	{
-		$eventName = $sp['eventName'];
-		$routes = $sp['routes'];
-
-
-		$this->modx->log(1, print_r('зашли в - '.$eventName, 1));
-
-		if (empty($routes)) {
-			$this->modx->log(1, print_r('[virtualpage]:Error empty routes for event - ' . $eventName, 1));
+		$ids = $sp['routes'];
+		$this->event = $sp['eventName'];
+		if(empty($ids)) {
+			$this->modx->log(1, print_r('[virtualpage]:Error empty routes for event - ' . $this->event, 1));
 			return false;
 		}
-
 		//
-		foreach($routes as $n => $v) {
-
-			$this->modx->log(1 , print_r('i- '. $n  ,1));
-
-
-			if(!$route = $this->modx->getObject('vpRoute', array('id' => $n, 'active' => 1))) {continue;}
-
+		$this->routes = $this->generateRouteArray($ids);
+		$dispatcher = $this->getDispatcher();
+		//
+		$params = $dispatcher->dispatch($this->getMethod(), $this->getUri());
+		switch ($params[0]) {
+			case FastRoute\Dispatcher::NOT_FOUND:
+			case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+				return $this->error();
+				break;
+			case FastRoute\Dispatcher::FOUND:
+				return $this->handle($params[1], $params[2]);
+				break;
 		}
+
 		return true;
+	}
+
+	/**
+	 * @param $id
+	 * @param array $data
+	 * @return null
+	 */
+	public function handle($id, array $data) {
+
+		$this->modx->log(1 , print_r('handle' ,1));
+		
+
+		return '';
+	}
+
+
+
+
+	/**
+	 * @param $ids
+	 * @return mixed
+	 */
+	public function generateRouteArray($ids)
+	{
+		$key = 'route';
+		$cacheKey = $this->config['cache_key']
+			. $key
+			. '/'
+			. $this->event;
+		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
+		$routes = $this->modx->getCacheManager()->get($key, $cacheOptions);
+
+		if(!empty($routes)) {return $routes;}
+		//
+		foreach ($ids as $n => $v) {
+			if(!$route = $this->modx->getObject('vpRoute', array('id' => $n, 'active' => 1))) {continue;}
+			$routes[$n][0] = $route->get('metod');
+			$routes[$n][1] = $route->get('route');
+			$routes[$n][2] = $route->get('handler');
+		}
+		$this->modx->cacheManager->set($key, $routes, 0, $cacheOptions);
+
+		return $routes;
+	}
+
+	/**
+	 * @return FastRoute\Dispatcher|FastRoute\Dispatcher\GroupCountBased
+	 */
+	public function getDispatcher() {
+		if (!isset($this->dispatcher)) {
+			// create fastrouter path
+			$key = $this->config['fastrouter_cache_key'];
+			$this->createCachePath($key);
+			$cache = $this->modx->getOption(xPDO::OPT_CACHE_PATH)
+				. $this->config['cache_key']
+				. $key;
+			//
+			$this->dispatcher = FastRoute\cachedDispatcher(function (FastRoute\RouteCollector $router) {
+				$this->getRoutes($router);
+			}, array('cacheFile' => $cache.'/'.$this->event.'.cache.php'));
+		}
+		return $this->dispatcher;
+	}
+
+	/**
+	 * @param FastRoute\RouteCollector $router
+	 */
+	protected function getRoutes(FastRoute\RouteCollector $router) {
+		$routes = $this->routes;
+		if (!$routes) {
+			throw new InvalidArgumentException('Invalid routes');
+		}
+		foreach ($routes as $r) {
+			$router->addRoute($r[0], $r[1], $r[2]);
+		}
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getMethod() {
+		return $_SERVER['REQUEST_METHOD'];
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getUri() {
+		$alias = $this->modx->getOption('request_alias', null, 'q');
+		$uri = isset($_REQUEST[$alias]) ? (string) $_REQUEST[$alias] : '';
+		return '/' . ltrim($uri, '/');
+	}
+
+	/**
+	 * @return string
+	 */
+	public function error() {
+		$this->modx->sendErrorPage(array('vp_die' => true));
+		return '';
 	}
 
 	/**
@@ -197,6 +310,23 @@ class virtualpage {
 		$cacheKey = $this->config['cache_key'].$key;
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
 		$this->modx->cacheManager->clean($cacheOptions);
+	}
+
+	/**
+	 * create cache path for $key
+	 *
+	 * @param string $key
+	 */
+	public function createCachePath($key = 'fastrouter')
+	{
+		$cacheKey = $this->config['cache_key'].$key;
+		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
+		$empty = $this->modx->getCacheManager()->get($key, $cacheOptions);
+		//
+		if(empty($empty)) {
+			$empty['empty'] = 1;
+			$this->modx->cacheManager->set($key, $empty, 0, $cacheOptions);
+		}
 	}
 
 	/**

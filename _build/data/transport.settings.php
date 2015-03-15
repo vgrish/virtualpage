@@ -15,6 +15,13 @@ $tmp = array(
 		'value' => 'Categories,Chunks,Contexts,Internationalization,Media Sources,Plugin Events,Plugins,Property Sets,Resources,RichText Editor,Security,Snippets,Template Variables,Templates,User Groups,Users',
 		'area' => 'virtualpage_part_1',
 	),
+
+	'fastrouter_key' => array(
+		'xtype' => 'textfield',
+		'value' => 'fastrouter',
+		'area' => 'virtualpage_part_1',
+	),
+
 	// exclude_event_groupname
 	//временные
 
