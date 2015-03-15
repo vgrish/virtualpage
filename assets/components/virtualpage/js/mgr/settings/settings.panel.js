@@ -40,16 +40,6 @@ virtualpage.panel.Settings = function(config) {
                     xtype: 'virtualpage-grid-route'
                 }]
             },{
-                title: _('vp_events')
-                , items: [{
-                    html: '<p>' + _('vp_events_intro') + '</p>'
-                    , border: false
-                    , bodyCssClass: 'panel-desc'
-                    , bodyStyle: 'margin-bottom: 10px'
-                }, {
-                    xtype: 'virtualpage-grid-event'
-                }]
-            },{
                 title: _('vp_handlers')
                 , items: [{
                     html: '<p>' + _('vp_handlers_intro') + '</p>'
@@ -58,6 +48,16 @@ virtualpage.panel.Settings = function(config) {
                     , bodyStyle: 'margin-bottom: 10px'
                 }, {
                     xtype: 'virtualpage-grid-handler'
+                }]
+            },{
+                title: _('vp_events')
+                , items: [{
+                    html: '<p>' + _('vp_events_intro') + '</p>'
+                    , border: false
+                    , bodyCssClass: 'panel-desc'
+                    , bodyStyle: 'margin-bottom: 10px'
+                }, {
+                    xtype: 'virtualpage-grid-event'
                 }]
             }
 

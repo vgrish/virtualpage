@@ -22,7 +22,6 @@ $_lang['vp_combo_select'] = 'Нажмите для выбора';
 
 $_lang['vp_id'] = 'Id';
 $_lang['vp_name'] = 'Имя';
-$_lang['vp_color'] = 'Цвет';
 
 $_lang['vp_active'] = 'Включен';
 $_lang['vp_description'] = 'Описание';
@@ -47,10 +46,6 @@ $_lang['vp_type_snippet'] = 'Сниппет';
 
 $_lang['vp_all'] = 'Все';
 $_lang['vp_empty'] = 'Нет';
-
-$_lang['vp_createdon'] = 'Дата создания';
-$_lang['vp_updatedon'] = 'Дата изменения';
-$_lang['vp_timestamp'] = 'Метка времени';
 
 $_lang['vp_resource'] = 'Ресурс';
 $_lang['vp_comment'] = 'Комментарий';

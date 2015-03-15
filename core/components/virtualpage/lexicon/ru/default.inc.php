@@ -6,7 +6,7 @@ foreach ($files as $file) {
 }
 
 $_lang['virtualpage'] = 'virtualpage';
-$_lang['vp_menu_desc'] = 'Пример расширения для разработки.';
+$_lang['vp_menu_desc'] = 'Управление виртуальными страницами.';
 
 $_lang['vp_settings'] = 'Настройки';
 
