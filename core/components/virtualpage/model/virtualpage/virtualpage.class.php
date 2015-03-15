@@ -118,7 +118,6 @@ class virtualpage {
 		//
 		$params = $dispatcher->dispatch($this->getMethod(), $this->getUri());
 		switch ($params[0]) {
-			case FastRoute\Dispatcher::NOT_FOUND:
 			case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
 				return $this->error();
 				break;
@@ -184,9 +183,9 @@ class virtualpage {
 			. $key
 			. '/'
 			. $this->event;
+
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
 		$routes = $this->modx->getCacheManager()->get($key, $cacheOptions);
-
 		if(!empty($routes)) {return $routes;}
 		//
 		foreach ($ids as $n => $v) {
@@ -204,7 +203,7 @@ class virtualpage {
 	 * @return FastRoute\Dispatcher|FastRoute\Dispatcher\GroupCountBased
 	 */
 	public function getDispatcher() {
-		if (!isset($this->dispatcher)) {
+		if (!isset($this->dispatcher[$this->event])) {
 			// create fastrouter path
 			$key = $this->config['fastrouter_cache_key'];
 			$this->createCachePath($key);
@@ -212,11 +211,11 @@ class virtualpage {
 				. $this->config['cache_key']
 				. $key;
 			//
-			$this->dispatcher = FastRoute\cachedDispatcher(function (FastRoute\RouteCollector $router) {
+			$this->dispatcher[$this->event] = FastRoute\cachedDispatcher(function (FastRoute\RouteCollector $router) {
 				$this->getRoutes($router);
 			}, array('cacheFile' => $cache.'/'.$this->event.'.cache.php'));
 		}
-		return $this->dispatcher;
+		return $this->dispatcher[$this->event];
 	}
 
 	/**
