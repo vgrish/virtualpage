@@ -5,7 +5,7 @@ foreach ($files as $file) {
 	@include_once($file);
 }
 
-$_lang['virtualpage'] = 'virtualpage';
+$_lang['virtualpage'] = 'VirtualPage';
 $_lang['vp_menu_desc'] = 'Управление виртуальными страницами.';
 
 $_lang['vp_settings'] = 'Настройки';

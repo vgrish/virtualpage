@@ -4,7 +4,7 @@ $settings = array();
 
 $tmp = array(
 
-	'active' => array( // включить подгрузку плагинов
+	'active' => array(
 		'xtype' => 'combo-boolean',
 		'value' => true,
 		'area' => 'virtualpage_main',
@@ -13,18 +13,19 @@ $tmp = array(
 	'exclude_event_groupname' => array(
 		'xtype' => 'textarea',
 		'value' => 'Categories,Chunks,Contexts,Internationalization,Media Sources,Plugin Events,Plugins,Property Sets,Resources,RichText Editor,Security,Snippets,Template Variables,Templates,User Groups,Users',
-		'area' => 'virtualpage_part_1',
+		'area' => 'virtualpage_main',
 	),
 
 	'fastrouter_key' => array(
 		'xtype' => 'textfield',
 		'value' => 'fastrouter',
-		'area' => 'virtualpage_part_1',
+		'area' => 'virtualpage_main',
 	),
 
 	// exclude_event_groupname
 	//временные
-
+/*
+ *
 	'assets_path' => array(
 		'xtype' => 'textfield',
 		'value' => '{base_path}virtualpage/assets/components/virtualpage/',
@@ -41,13 +42,8 @@ $tmp = array(
 		'area' => 'virtualpage_temp',
 	),
 
-	/*
-	'some_setting' => array(
-		'xtype' => 'combo-boolean',
-		'value' => true,
-		'area' => 'virtualpage_main',
-	),
-	*/
+*/
+
 );
 
 foreach ($tmp as $k => $v) {
