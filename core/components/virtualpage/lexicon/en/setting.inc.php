@@ -10,3 +10,4 @@ $_lang['setting_virtualpage_fastrouter_key_desc'] = 'Ключ в массиве 
 $_lang['setting_virtualpage_exclude_event_groupname'] = 'Исключить события';
 $_lang['setting_virtualpage_exclude_event_groupname_desc'] = 'Имена групп событий. Входящие в группу события будут исключены. ';
 
+ 
