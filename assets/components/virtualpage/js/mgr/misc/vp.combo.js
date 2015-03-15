@@ -129,7 +129,7 @@ virtualpage.combo.Entry = function(config) {
         ,valueField: 'id'
         ,editable: true
         ,fields: ['id','name']
-        ,pageSize: 20
+        ,pageSize: 10
         ,emptyText: _('vp_combo_select')
         ,hideMode: 'offsets'
         ,url: virtualpage.config.connector_url
@@ -137,6 +137,7 @@ virtualpage.combo.Entry = function(config) {
             action: 'mgr/misc/entry/getlist'
             ,element: 'resource'
             ,combo: true
+            ,limit: 0
         }
     });
     virtualpage.combo.Entry.superclass.constructor.call(this,config);

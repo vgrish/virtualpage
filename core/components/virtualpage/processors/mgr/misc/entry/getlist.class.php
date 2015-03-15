@@ -5,10 +5,12 @@ class vpEntryGetListProcessor extends modObjectProcessor {
 	public function process() {
 
 		$element = $this->getProperty('element', 'resource');
+		$query = $this->getProperty('query');
 
 		if(!$response = $this->modx->runProcessor('getlist',
 			array(
 				'combo' => true,
+				'query' => $query,
 			),
 			array('processors_path' => dirname(dirname(__FILE__)).'/'.$element.'/')
 		)) {
