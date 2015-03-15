@@ -22,19 +22,10 @@ class virtualpageSettingsManagerController extends virtualpageMainController {
 
 	public function loadCustomCssJs() {
 		$this->addJavascript(MODX_MANAGER_URL . 'assets/modext/util/datetime.js');
-		//$this->addJavascript(MODX_MANAGER_URL . 'assets/modext/workspace/lexicon/combos.js');
 
 		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/misc/utils.js');
 		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/misc/vp.combo.js');
-//		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/misc/category.tree.js');
-//
-//		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/event.grid.js');
-//		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/bonus.grid.js');
-//		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/payment.grid.js');
-//		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/status.grid.js');
-//		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/statususers.grid.js');
-//		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/setting.grid.js');
-//		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/lexicon.grid.js');
+
 		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/route.grid.js');
 		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/event.grid.js');
 		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/handler.grid.js');

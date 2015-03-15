@@ -3,10 +3,10 @@
 $snippets = array();
 
 $tmp = array(
-	'virtualpage' => array(
+/*	'virtualpage' => array(
 		'file' => 'virtualpage',
 		'description' => '',
-	),
+	),*/
 );
 
 foreach ($tmp as $k => $v) {
