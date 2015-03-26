@@ -26,6 +26,23 @@ class vpHandlerGetListProcessor extends modObjectGetListProcessor {
 	public function prepareRow(xPDOObject $object) {
 		$array = $object->toArray();
 
+		switch($array['type']) {
+			case 0: {
+				$n = 'vp_type_resource';
+				break;
+			}
+			case 1: {
+				$n = 'vp_type_snippet';
+				break;
+			}
+			case 2: {
+				$n = 'vp_type_chunk';
+				break;
+			}
+
+		}
+		$array['name_type'] = $this->modx->lexicon($n);
+
 		return $array;
 	}
 }

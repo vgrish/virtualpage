@@ -3,20 +3,28 @@ virtualpage.utils.renderBoolean = function (value, props, row) {
 	return value
 		? String.format('<span class="green">{0}</span>', _('yes'))
 		: String.format('<span class="red">{0}</span>', _('no'));
-}
+};
 
 virtualpage.utils.renderType = function (value, props, row) {
 
-	return value
-		? String.format('<span class="green">{0}</span>', _('vp_type_snippet'))
-		: String.format('<span class="red">{0}</span>', _('vp_type_resource'));
-}
+	return row.data.name_type
+		? String.format('<span class="green">{0}</span>', row.data.name_type)
+		: String.format('<span class="red">{0}</span>', value);
+};
+
+virtualpage.utils.renderHandler = function (value, props, row) {
+
+	return row.data.handler_name
+		? String.format('<span class="green">{0}</span>', row.data.handler_name)
+		: String.format('<span class="red">{0}</span>', value);
+};
 
 virtualpage.utils.renderEvent = function (value, props, row) {
+
 	return row.json.event_name
 		? row.json.event_name
 		: value;
-}
+};
 
 
 virtualpage.utils.getMenu = function (actions, grid, selected) {

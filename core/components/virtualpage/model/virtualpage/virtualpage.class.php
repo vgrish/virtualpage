@@ -149,6 +149,25 @@ class virtualpage {
 				break;
 			case 1:
 				if ($snippet = $this->modx->getObject('modSnippet', $entry)) {
+					$this->modx->setPlaceholders($data, 'vp.');
+					$snippet->_cacheable = false;
+					$snippet->_processed = false;
+					//
+					$properties = $snippet->getProperties();
+					$properties = array_merge($properties, $_REQUEST);
+					//
+					$output = $snippet->process($properties);
+					if (strpos($output, '[[') !== false) {
+						$maxIterations= intval($this->modx->getOption('parser_max_iterations', $options, 10));
+						$this->modx->parser->processElementTags('', $output, true, false, '[[', ']]', array(), $maxIterations);
+						$this->modx->parser->processElementTags('', $output, true, true, '[[', ']]', array(), $maxIterations);
+					}
+					exit($output);
+				}
+				break;
+			case 2:
+				if ($snippet = $this->modx->getObject('modChunk', $entry)) {
+					$this->modx->setPlaceholders($data, 'vp.');
 					$snippet->_cacheable = false;
 					$snippet->_processed = false;
 					//

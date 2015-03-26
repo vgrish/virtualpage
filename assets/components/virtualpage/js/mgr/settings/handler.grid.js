@@ -38,20 +38,19 @@ virtualpage.grid.Handler = function(config) {
         ,baseParams: {
             action: 'mgr/settings/handler/getlist'
         }
-        ,fields: ['id', 'name', 'type', 'entry', 'description', 'active']
+        ,fields: ['id', 'name', 'type', 'entry', 'description', 'active', 'name_type']
         ,autoHeight: true
         ,paging: true
         ,remoteSort: true
         ,save_action: 'mgr/settings/handler/updatefromgrid'
         ,autosave: true
+		,save_callback: this.updateRow
         ,plugins: this.exp
         ,columns: [this.exp
             ,{header: _('vp_id'),dataIndex: 'id',width: 50, sortable: true}
             ,{header: _('vp_name'),dataIndex: 'name',width: 50, editor: {xtype: 'textfield', allowBlank: false}, sortable: true}
             ,{header: _('vp_type'),dataIndex: 'type',width:50, editor: {xtype:'virtualpage-combo-type', allowBlank: false}, sortable: true, renderer: virtualpage.utils.renderType}
-
             ,{header: _('vp_entry'),dataIndex: 'entry',width: 50, sortable: true}
-
             ,{header: _('vp_active'),dataIndex: 'active',sortable:true, width:50, editor:{xtype:'combo-boolean', renderer:'boolean'}}
         ]
         ,tbar: [{
@@ -81,6 +80,10 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
         });
         this.addContextMenuItem(m);
     }
+
+	,updateRow: function(response) {
+		Ext.getCmp('virtualpage-grid-handler').refresh();
+	}
 
     ,createHandler: function(btn,e) {
         if (!this.windows.createHandler) {
@@ -159,9 +162,13 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
             case 1:
             case '1': {
                 entry.baseParams.element = 'snippet';
-
                 break;
             }
+			case 2:
+			case '2': {
+				entry.baseParams.element = 'chunk';
+				break;
+			}
         }
         entry.store.load();
 

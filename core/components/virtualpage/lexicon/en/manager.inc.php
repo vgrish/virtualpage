@@ -43,6 +43,7 @@ $_lang['vp_entry'] = 'Entry';
 
 $_lang['vp_type_resource'] = 'Resource';
 $_lang['vp_type_snippet'] = 'Snippet';
+$_lang['vp_type_chunk'] = 'Chunk';
 
 $_lang['vp_all'] = 'All';
 $_lang['vp_empty'] = 'No';

@@ -1,5 +1,10 @@
 Changelog for virtualpage.
 
+1.0.1-beta
+==============
+- add handler type "chunk"
+- small fix
+
 1.0.0-beta
 ==============
 - Initial release.

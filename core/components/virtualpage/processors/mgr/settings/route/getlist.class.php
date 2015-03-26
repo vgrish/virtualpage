@@ -15,8 +15,9 @@ class vpRouteGetListProcessor extends modObjectGetListProcessor {
 	public function prepareQueryBeforeCount(xPDOQuery $c) {
 
 		$c->leftJoin('vpEvent','vpEvent', '`vpRoute`.`event` = `vpEvent`.`id`');
+		$c->leftJoin('vpHandler','vpHandler', '`vpRoute`.`handler` = `vpHandler`.`id`');
 		$routeColumns = $this->modx->getSelectColumns('vpRoute', 'vpRoute', '', array(), true);
-		$c->select($routeColumns . ', `vpEvent`.`name` as `event_name`');
+		$c->select($routeColumns . ', `vpEvent`.`name` as `event_name`, `vpHandler`.`name` as `handler_name`');
 
 		if ($active = $this->getProperty('active')) {
 			$c->where(array('active' => $active));

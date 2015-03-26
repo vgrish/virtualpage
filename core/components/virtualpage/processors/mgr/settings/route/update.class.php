@@ -14,9 +14,13 @@ class vpRouteUpdateProcessor extends modObjectUpdateProcessor {
 	}
 	/** {@inheritDoc} */
 	public function beforeSet() {
-/*		if ($this->modx->getObject('vpRoute',array('name' => $this->getProperty('name'), 'id:!=' => $this->getProperty('id') ))) {
-			$this->modx->error->addField('name', $this->modx->lexicon('vp_err_ae'));
-		}*/
+		if ($this->modx->getObject('vpRoute',array(
+			'route' => $this->getProperty('route'),
+			'metod' => $this->getProperty('metod'),
+			'id:!=' => $this->getProperty('id')
+		))) {
+			$this->modx->error->addField('route', $this->modx->lexicon('vp_err_ae'));
+		}
 		$id = $this->object->get('id');
 		$eventId = $this->object->get('event');
 

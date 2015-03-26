@@ -105,7 +105,8 @@ virtualpage.combo.Type = function(config) {
             ,fields: ['type','display']
             ,data: [
                 [0,_('vp_type_resource')],
-                [1,_('vp_type_snippet')]
+                [1,_('vp_type_snippet')],
+				[2,_('vp_type_chunk')]
             ]
         })
         ,mode: 'local'
