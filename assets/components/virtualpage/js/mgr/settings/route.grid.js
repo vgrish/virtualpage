@@ -102,6 +102,7 @@ Ext.extend(virtualpage.grid.Route,MODx.grid.Grid,{
         this.windows.createRoute.fp.getForm().reset();
         this.windows.createRoute.fp.getForm().setValues({
             active: 1
+			,metod: 'GET,POST'
         });
         this.windows.createRoute.show(e.target);
     }
