@@ -116,12 +116,14 @@ class virtualpage {
 		$this->routes = $this->generateRouteArray($ids);
 		$dispatcher = $this->getDispatcher();
 		//
-		$params = $dispatcher->dispatch($this->getMethod(), $this->getUri());
+		$uri = $this->getUri();
+		$params = $dispatcher->dispatch($this->getMethod(), $uri);
 		switch ($params[0]) {
 			case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
 				return $this->error();
 				break;
 			case FastRoute\Dispatcher::FOUND:
+				$params[2]['uri'] = $uri;
 				return $this->handle($params[1], $params[2]);
 				break;
 		}
