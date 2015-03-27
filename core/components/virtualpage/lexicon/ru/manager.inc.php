@@ -37,6 +37,8 @@ $_lang['vp_handler'] = 'Обработчик';
 $_lang['vp_metod'] = 'Метод';
 $_lang['vp_metod_get'] = 'GET';
 $_lang['vp_metod_post'] = 'POST';
+$_lang['vp_metod_get_post'] = 'GET,POST';
+
 
 $_lang['vp_type'] = 'Тип';
 $_lang['vp_entry'] = 'Запись';

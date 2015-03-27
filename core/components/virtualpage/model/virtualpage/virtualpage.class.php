@@ -207,11 +207,21 @@ class virtualpage {
 		$routes = $this->modx->getCacheManager()->get($key, $cacheOptions);
 		if(!empty($routes)) {return $routes;}
 		//
+		$match = array();
 		foreach ($ids as $n => $v) {
 			if(!$route = $this->modx->getObject('vpRoute', array('id' => $n, 'active' => 1))) {continue;}
-			$routes[$n][0] = $route->get('metod');
-			$routes[$n][1] = $route->get('route');
-			$routes[$n][2] = $route->get('handler');
+			foreach ((array) explode(',', $route->get('metod')) as $method) {
+				if((!empty($match[$route->get('route')]))
+					&& (in_array($method, array_values($match[$route->get('route')])))) {
+					continue;
+				}
+				$routes[] = array(
+					0 => $method,
+					1 => $route->get('route'),
+					2 => $route->get('handler'),
+				);
+				$match[$route->get('route')][] = $method;
+			}
 		}
 		$this->modx->cacheManager->set($key, $routes, 0, $cacheOptions);
 

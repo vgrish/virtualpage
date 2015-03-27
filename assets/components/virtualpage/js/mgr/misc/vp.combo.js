@@ -83,7 +83,8 @@ virtualpage.combo.Metod = function(config) {
             ,fields: ['metod','display']
             ,data: [
                 ['GET',_('vp_metod_get')],
-                ['POST',_('vp_metod_post')]
+                ['POST',_('vp_metod_post')],
+				['GET,POST',_('vp_metod_get_post')]
             ]
         })
         ,mode: 'local'
