@@ -22,7 +22,12 @@ $tmp = array(
 		'area' => 'virtualpage_main',
 	),
 
-	// exclude_event_groupname
+	'prefix_placeholder' => array(
+		'xtype' => 'textfield',
+		'value' => 'vp.',
+		'area' => 'virtualpage_main',
+	),
+
 	//временные
 /*
  *

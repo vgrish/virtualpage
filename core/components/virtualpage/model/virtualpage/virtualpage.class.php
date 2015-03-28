@@ -141,56 +141,26 @@ class virtualpage {
 			return $this->error();
 		}
 		$_REQUEST += array($this->fastrouterKey => $data);
-		//
 		$type = $handler->get('type');
 		$entry = $handler->get('entry');
+		$prefix = $this->modx->getOption('virtualpage_prefix_placeholder', null, 'vp.');
+		$this->modx->setPlaceholders($data, $prefix);
+		$output = '';
 		switch ($type) {
 			case 0:
-				$this->modx->setPlaceholders($data, 'vp.');
 				$this->modx->sendForward($entry);
 				break;
 			case 1:
-				if ($snippet = $this->modx->getObject('modSnippet', $entry)) {
-					$this->modx->setPlaceholders($data, 'vp.');
-					$snippet->_cacheable = false;
-					$snippet->_processed = false;
-					//
-					$properties = $snippet->getProperties();
-					$properties = array_merge($properties, $_REQUEST);
-					//
-					$output = $snippet->process($properties);
-					if (strpos($output, '[[') !== false) {
-						$maxIterations= intval($this->modx->getOption('parser_max_iterations', $options, 10));
-						$this->modx->parser->processElementTags('', $output, true, false, '[[', ']]', array(), $maxIterations);
-						$this->modx->parser->processElementTags('', $output, true, true, '[[', ']]', array(), $maxIterations);
-					}
-					exit($output);
-				}
+				$output = $this->process('modSnippet', $entry, $data);
 				break;
 			case 2:
-				if ($snippet = $this->modx->getObject('modChunk', $entry)) {
-					$this->modx->setPlaceholders($data, 'vp.');
-					$snippet->_cacheable = false;
-					$snippet->_processed = false;
-					//
-					$properties = $snippet->getProperties();
-					$properties = array_merge($properties, $_REQUEST);
-					//
-					$output = $snippet->process($properties);
-					if (strpos($output, '[[') !== false) {
-						$maxIterations= intval($this->modx->getOption('parser_max_iterations', $options, 10));
-						$this->modx->parser->processElementTags('', $output, true, false, '[[', ']]', array(), $maxIterations);
-						$this->modx->parser->processElementTags('', $output, true, true, '[[', ']]', array(), $maxIterations);
-					}
-					exit($output);
-				}
+				$output = $this->process('modChunk', $entry, $data);
 				break;
 			default:
-				return $this->error();
+				$output = $this->error();
 				break;
 		}
-
-		return '';
+		exit($output);
 	}
 
 	/**
@@ -218,9 +188,9 @@ class virtualpage {
 					continue;
 				}
 				$routes[] = array(
-					0 => $method,
-					1 => $route->get('route'),
-					2 => $route->get('handler'),
+					$method,
+					$route->get('route'),
+					$route->get('handler'),
 				);
 				$match[$route->get('route')][] = $method;
 			}
@@ -384,6 +354,28 @@ class virtualpage {
 			$empty['empty'] = 1;
 			$this->modx->cacheManager->set($key, $empty, 0, $cacheOptions);
 		}
+	}
+
+	/**
+	 * @param string $object
+	 * @param $entry
+	 *
+	 * @return string
+	 */
+	public function process($object = 'modSnippet', $entry) {
+		$output = '';
+		if ($snippet = $this->modx->getObject($object, $entry)) {
+			$snippet->_cacheable = false;
+			$snippet->_processed = false;
+			$properties = $snippet->getProperties();
+			$output = $snippet->process($properties);
+			if (strpos($output, '[[') !== false) {
+				$maxIterations= intval($this->modx->getOption('parser_max_iterations', null, 10));
+				$this->modx->parser->processElementTags('', $output, true, false, '[[', ']]', array(), $maxIterations);
+				$this->modx->parser->processElementTags('', $output, true, true, '[[', ']]', array(), $maxIterations);
+			}
+		}
+		return $output;
 	}
 
 	/**

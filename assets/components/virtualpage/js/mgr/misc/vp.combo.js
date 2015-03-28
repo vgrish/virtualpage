@@ -32,7 +32,7 @@ virtualpage.combo.Event = function(config) {
         , hiddenName: 'event'
         , displayField: 'name'
         , valueField: 'id'
-        , editable: true
+        //, editable: true
         , fields: ['name','id']
         , pageSize: 10
         , emptyText: _('vp_combo_select')
@@ -57,7 +57,7 @@ virtualpage.combo.Handler = function(config) {
         , hiddenName: 'handler'
         , displayField: 'name'
         , valueField: 'id'
-        , editable: true
+        //, editable: true
         , fields: ['name','id']
         , pageSize: 10
         , emptyText: _('vp_combo_select')

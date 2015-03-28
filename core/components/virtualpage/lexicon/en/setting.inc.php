@@ -10,3 +10,5 @@ $_lang['setting_virtualpage_fastrouter_key_desc'] = 'Ключ в массиве 
 $_lang['setting_virtualpage_exclude_event_groupname'] = 'Исключить события';
 $_lang['setting_virtualpage_exclude_event_groupname_desc'] = 'Имена групп событий. Входящие в группу события будут исключены. ';
 
+$_lang['setting_prefix_placeholder'] = 'The prefix placeholders';
+$_lang['setting_prefix_placeholder_desc'] = 'The prefix placeholders in handleк. Default "vp."';
