@@ -1,5 +1,10 @@
 Changelog for virtualpage.
 
+1.0.2-beta
+==============
+- add method "GET,POST"
+- add prefix pl
+
 1.0.1-beta
 ==============
 - add handler type "chunk"
