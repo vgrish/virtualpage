@@ -23,7 +23,7 @@ class vpHandlerUpdateProcessor extends modObjectUpdateProcessor {
 			'id:!=' => $this->getProperty('id')
 		))) {
 			$this->modx->error->addField('entry', $this->modx->lexicon('vp_err_ae'));
-		}*/
+		}*/ 
 
 		return parent::beforeSet();
 	}
