@@ -16,9 +16,9 @@ class vpHandlerCreateProcessor extends modObjectCreateProcessor {
 		if ($this->modx->getObject('vpHandler',array('name' => $this->getProperty('name')))) {
 			$this->modx->error->addField('name', $this->modx->lexicon('vp_err_ae'));
 		}
-		if ($this->modx->getObject('vpHandler',array('type' => $this->getProperty('type'), 'entry' => $this->getProperty('entry')))) {
+/*		if ($this->modx->getObject('vpHandler',array('type' => $this->getProperty('type'), 'entry' => $this->getProperty('entry')))) {
 			$this->modx->error->addField('entry', $this->modx->lexicon('vp_err_ae'));
-		}
+		}*/
 
 		return !$this->hasErrors();
 	}

@@ -17,13 +17,13 @@ class vpHandlerUpdateProcessor extends modObjectUpdateProcessor {
 		if ($this->modx->getObject('vpHandler',array('name' => $this->getProperty('name'), 'id:!=' => $this->getProperty('id') ))) {
 			$this->modx->error->addField('name', $this->modx->lexicon('vp_err_ae'));
 		}
-		if ($this->modx->getObject('vpHandler',array(
+/*		if ($this->modx->getObject('vpHandler',array(
 			'type' => $this->getProperty('type'),
 			'entry' => $this->getProperty('entry'),
 			'id:!=' => $this->getProperty('id')
 		))) {
 			$this->modx->error->addField('entry', $this->modx->lexicon('vp_err_ae'));
-		}
+		}*/
 
 		return parent::beforeSet();
 	}

@@ -1,5 +1,9 @@
 Changelog for virtualpage.
 
+1.0.3-beta
+==============
+- small fix
+
 1.0.2-beta
 ==============
 - add method "GET,POST"
