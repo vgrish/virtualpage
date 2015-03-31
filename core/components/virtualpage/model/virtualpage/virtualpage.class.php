@@ -85,22 +85,6 @@ class virtualpage {
 	}
 
 	/**
-	 * Shorthand for load and run an processor in this component
-	 *
-	 * @param string $action
-	 * @param array $scriptProperties
-	 *
-	 * @return mixed
-	 */
-	function runProcessor($action = '', $scriptProperties = array()) {
-		$this->modx->error->errors = $this->modx->error->message = null;
-		return $this->modx->runProcessor($action, $scriptProperties, array(
-				'processors_path' => $this->config['processorsPath']
-			)
-		);
-	}
-
-	/**
 	 * @param array $sp
 	 * @return bool|null
 	 */
@@ -113,24 +97,29 @@ class virtualpage {
 			return false;
 		}
 		//
+		$uri = $this->getUri();
 		$this->routes = $this->generateRouteArray($ids);
 		$dispatcher = $this->getDispatcher();
-		//
-		$uri = $this->getUri();
 		$params = $dispatcher->dispatch($this->getMethod(), $uri);
-
-		$this->modx->log(1, print_r('======' ,1));
-		$this->modx->log(1, print_r($params, 1));
-		$this->modx->log(1, print_r($uri, 1));
-		$this->modx->log(1, print_r($this->routes, 1));
-
 		switch ($params[0]) {
 			case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
 				return $this->error();
 				break;
 			case FastRoute\Dispatcher::FOUND:
+				$properties = $this->getCache('properties');
+				foreach($ids as $id => $z) {
+					$found = array();
+					$route = $properties[$id]['route'];
+					$property = $properties[$id]['properties'];
+					if(empty($property) || empty($route)) {continue;}
+					preg_match_all("/{([^}]+)}*/i", $route, $found);
+					$url = str_replace($found[0], array_values($params[2]), $route);
+					if($url == $uri) {
+						$params[2] = array_merge($params[2], $property);
+						break;
+					}
+				}
 				$params[2]['uri'] = $uri;
-				$params[2]['routes'] = $ids;
 				return $this->handle($params[1], $params[2]);
 				break;
 		}
@@ -148,15 +137,6 @@ class virtualpage {
 			return $this->error();
 		}
 		$_REQUEST += array($this->fastrouterKey => $data);
-		// set placeholders
-		$routes = $data['routes'];
-		unset($data['routes']);
-		foreach($routes as $id => $z) {
-			if(!$route = $this->modx->getObject('vpRoute', $id)) {continue;}
-			$properties = $route->get('properties');
-			if(empty($properties) || !is_array($properties)) {continue;}
-			$data = array_merge($data, $properties);
-		}
 		$type = $handler->get('type');
 		$entry = $handler->get('entry');
 		$content = $handler->get('content');
@@ -191,16 +171,9 @@ class virtualpage {
 	public function generateRouteArray($ids)
 	{
 		$key = 'route';
-		$cacheKey = $this->config['cache_key']
-			. $key
-			. '/'
-			. $this->event;
-
-		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
-		$routes = $this->modx->getCacheManager()->get($key, $cacheOptions);
+		$routes = $this->getCache($key);
 		if(!empty($routes)) {return $routes;}
-		//
-		$match = array();
+		$match = $properties = array();
 		foreach ($ids as $n => $v) {
 			if(!$route = $this->modx->getObject('vpRoute', array('id' => $n, 'active' => 1))) {continue;}
 			foreach ((array) explode(',', $route->get('metod')) as $method) {
@@ -213,10 +186,16 @@ class virtualpage {
 					$route->get('route'),
 					$route->get('handler'),
 				);
+				$properties[$route->get('id')] = array(
+					'route' => $route->get('route'),
+					'properties' => $route->get('properties'),
+				);
 				$match[$route->get('route')][] = $method;
 			}
 		}
-		$this->modx->cacheManager->set($key, $routes, 0, $cacheOptions);
+		$this->setCache($key, $routes);
+		$key = 'properties';
+		$this->setCache($key, $properties);
 
 		return $routes;
 	}
@@ -226,16 +205,11 @@ class virtualpage {
 	 */
 	public function getDispatcher() {
 		if (!isset($this->dispatcher[$this->event])) {
-			// create fastrouter path
 			$key = $this->config['fastrouter_cache_key'];
-			$this->createCachePath($key);
-			$cache = $this->modx->getOption(xPDO::OPT_CACHE_PATH)
-				. $this->config['cache_key']
-				. $key;
-			//
+			$cache = $this->modx->getOption(xPDO::OPT_CACHE_PATH) . $this->config['cache_key'] . $key;
 			$this->dispatcher[$this->event] = FastRoute\cachedDispatcher(function (FastRoute\RouteCollector $router) {
 				$this->getRoutes($router);
-			}, array('cacheFile' => $cache.'/'.$this->event.'.cache.php'));
+			}, array('cacheFile' => $cache.'.'.$this->event.'.cache.php'));
 		}
 		return $this->dispatcher[$this->event];
 	}
@@ -267,14 +241,6 @@ class virtualpage {
 		$alias = $this->modx->getOption('request_alias', null, 'q');
 		$uri = isset($_REQUEST[$alias]) ? (string) $_REQUEST[$alias] : '';
 		return '/' . ltrim($uri, '/');
-	}
-
-	/**
-	 * @return string
-	 */
-	public function error() {
-		$this->modx->sendErrorPage(array('vp_die' => true));
-		return '';
 	}
 
 	/**
@@ -329,10 +295,7 @@ class virtualpage {
 	public function getEvents()
 	{
 		$key = 'event';
-		$cacheKey = $this->config['cache_key'].$key;
-		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
-		$ListEvent = $this->modx->getCacheManager()->get($key, $cacheOptions);
-		//
+		$ListEvent = $this->getCache($key);
 		if (empty($ListEvent) && $this->modx->getCount('vpEvent') > 0) {
 			$data['active'] = 1;
 			$tmp = $this->runProcessor('mgr/settings/event/getlist', $data);
@@ -342,39 +305,10 @@ class virtualpage {
 					$ListEvent[$v['name']] = $v['routes'];
 				}
 			}
-			$this->modx->cacheManager->set($key, $ListEvent, 0, $cacheOptions);
+			$this->setCache($key, $ListEvent);
 		}
-		//
+
 		return $ListEvent;
-	}
-
-	/**
-	 * clear cache for $key
-	 *
-	 * @param string $key
-	 */
-	public function clearCache($key = 'event')
-	{
-		$cacheKey = $this->config['cache_key'].$key;
-		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
-		$this->modx->cacheManager->clean($cacheOptions);
-	}
-
-	/**
-	 * create cache path for $key
-	 *
-	 * @param string $key
-	 */
-	public function createCachePath($key = 'fastrouter')
-	{
-		$cacheKey = $this->config['cache_key'].$key;
-		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
-		$empty = $this->modx->getCacheManager()->get($key, $cacheOptions);
-		//
-		if(empty($empty)) {
-			$empty['empty'] = 1;
-			$this->modx->cacheManager->set($key, $empty, 0, $cacheOptions);
-		}
 	}
 
 	/**
@@ -419,6 +353,74 @@ class virtualpage {
 		}
 
 		return $output;
+	}
+
+	/**
+	 * @param $key
+	 * @param array $data
+	 * @return mixed
+	 */
+	public function setCache($key, $data = array())
+	{
+		if(empty($key)) {return $key;}
+		$cacheKey = $this->config['cache_key'];
+		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
+		$this->modx->cacheManager->set($key, $data, 0, $cacheOptions);
+
+		return $key;
+	}
+
+	/**
+	 * @param $key
+	 * @return mixed|string
+	 */
+	public function getCache($key)
+	{
+		$cached = '';
+		if(empty($key)) {return $cached;}
+		$cacheKey = $this->config['cache_key'];
+		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
+		$cached = $this->modx->getCacheManager()->get($key, $cacheOptions);
+
+		return $cached;
+	}
+
+	/**
+	 * @param $key
+	 * @return mixed
+	 */
+	public function clearCache($key = 'event')
+	{
+		if(empty($key)) {return $key;}
+		$cacheKey = $this->config['cache_key'];
+		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
+		$this->modx->cacheManager->clean($cacheOptions);
+
+		return $key;
+	}
+
+	/**
+	 * Shorthand for load and run an processor in this component
+	 *
+	 * @param string $action
+	 * @param array $scriptProperties
+	 *
+	 * @return mixed
+	 */
+	function runProcessor($action = '', $scriptProperties = array()) {
+		$this->modx->error->errors = $this->modx->error->message = null;
+		return $this->modx->runProcessor($action, $scriptProperties, array(
+				'processors_path' => $this->config['processorsPath']
+			)
+		);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function error() {
+		$this->modx->sendErrorPage(array('vp_die' => true));
+		return '';
 	}
 
 	/**
