@@ -124,6 +124,7 @@ class virtualpage {
 				break;
 			case FastRoute\Dispatcher::FOUND:
 				$params[2]['uri'] = $uri;
+				$params[2]['routes'] = $ids;
 				return $this->handle($params[1], $params[2]);
 				break;
 		}
@@ -141,6 +142,15 @@ class virtualpage {
 			return $this->error();
 		}
 		$_REQUEST += array($this->fastrouterKey => $data);
+		// set placeholders
+		$routes = $data['routes'];
+		unset($data['routes']);
+		foreach($routes as $id => $z) {
+			if(!$route = $this->modx->getObject('vpRoute', $id)) {continue;}
+			$properties = $route->get('properties');
+			if(empty($properties) || !is_array($properties)) {continue;}
+			$data = array_merge($data, $properties);
+		}
 		$type = $handler->get('type');
 		$entry = $handler->get('entry');
 		$prefix = $this->modx->getOption('virtualpage_prefix_placeholder', null, 'vp.');

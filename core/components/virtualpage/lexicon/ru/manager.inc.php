@@ -54,4 +54,7 @@ $_lang['vp_empty'] = 'Нет';
 $_lang['vp_resource'] = 'Ресурс';
 $_lang['vp_comment'] = 'Комментарий';
 $_lang['vp_options'] = 'Опции';
+$_lang['vp_placeholders'] = 'Плейсходеры';
+
+
 

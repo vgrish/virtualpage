@@ -38,7 +38,7 @@ virtualpage.grid.Route = function(config) {
         ,baseParams: {
             action: 'mgr/settings/route/getlist'
         }
-        ,fields: ['id', 'metod', 'route', 'handler', 'description', 'active', 'event', 'handler_name']
+        ,fields: ['id', 'metod', 'route', 'handler', 'description', 'properties', 'active', 'event', 'handler_name']
         ,autoHeight: true
         ,paging: true
         ,remoteSort: true
@@ -154,6 +154,7 @@ Ext.extend(virtualpage.grid.Route,MODx.grid.Grid,{
 
             ,{xtype: 'virtualpage-combo-event',fieldLabel: _('vp_event'), name: 'event', allowBlank: false, anchor: '99%', id: 'virtualpage-route-event-'+type}
             ,{xtype: 'virtualpage-combo-handler',fieldLabel: _('vp_handler'), name: 'handler', allowBlank: false, anchor: '99%', id: 'virtualpage-route-handler-'+type}
+            ,{xtype: 'textarea', fieldLabel: _('vp_placeholders'), name: 'properties', anchor: '99%', id: 'virtualpage-route-properties-'+type}
             ,{xtype: 'textarea', fieldLabel: _('vp_description'), name: 'description', anchor: '99%', id: 'virtualpage-route-description-'+type}
         );
 
