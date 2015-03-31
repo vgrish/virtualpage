@@ -118,6 +118,11 @@ class virtualpage {
 		//
 		$uri = $this->getUri();
 		$params = $dispatcher->dispatch($this->getMethod(), $uri);
+
+		$this->modx->log(1, print_r('======' ,1));
+		$this->modx->log(1, print_r($params, 1));
+		$this->modx->log(1, print_r($uri, 1));
+
 		switch ($params[0]) {
 			case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
 				return $this->error();
