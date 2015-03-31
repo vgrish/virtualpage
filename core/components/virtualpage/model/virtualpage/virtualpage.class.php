@@ -321,6 +321,13 @@ class virtualpage {
 		$output = '';
 		switch ($object) {
 			case 'modResource': {
+
+				$output = $this->getCache('aass');
+				if(!empty($output)) {
+					$output = $output['output'];
+					break;
+				}
+
 				$res = $this->modx->newObject('modResource');
 				$res->set('id', $this->modx->getOption('site_start'));
 				$res->fromArray(array(
@@ -331,6 +338,9 @@ class virtualpage {
 				$this->modx->resource = $res;
 				$this->modx->getResponse();
 				$output = $this->modx->response->outputContent();
+
+				$this->setCache('aass', array('output' => $output) );
+
 				break;
 			}
 			case 'modChunk':
@@ -362,6 +372,9 @@ class virtualpage {
 	 */
 	public function setCache($key, $data = array())
 	{
+
+		$this->modx->log(1 , print_r($key ,1));
+
 		if(empty($key)) {return $key;}
 		$cacheKey = $this->config['cache_key'];
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
