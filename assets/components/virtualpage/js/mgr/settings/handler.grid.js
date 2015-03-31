@@ -38,7 +38,7 @@ virtualpage.grid.Handler = function(config) {
         ,baseParams: {
             action: 'mgr/settings/handler/getlist'
         }
-        ,fields: ['id', 'name', 'type', 'entry', 'description', 'active', 'name_type']
+        ,fields: ['id', 'name', 'type', 'entry', 'content', 'description', 'active', 'name_type']
         ,autoHeight: true
         ,paging: true
         ,remoteSort: true
@@ -146,6 +146,7 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
     ,handleChangeType: function(type, change) {
         var el = Ext.getCmp('virtualpage-handler-type-'+type);
         var entry = Ext.getCmp('virtualpage-handler-entry-'+type);
+        var content = Ext.getCmp('virtualpage-handler-content-'+type);
 
         if(type !== 'update') {entry.reset();}
         if((change == 1) || (change == '1')) {
@@ -157,18 +158,27 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
             case 0:
             case '0': {
                 entry.baseParams.element = 'resource';
+                content.disable().hide();
                 break;
             }
             case 1:
             case '1': {
                 entry.baseParams.element = 'snippet';
+                content.disable().hide();
                 break;
             }
 			case 2:
 			case '2': {
 				entry.baseParams.element = 'chunk';
+                content.disable().hide();
 				break;
 			}
+            case 3:
+            case '3': {
+                entry.baseParams.element = 'template';
+                content.enable().show();
+                break;
+            }
         }
         entry.store.load();
 
@@ -187,6 +197,7 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
                 }
             }
             ,{xtype: 'virtualpage-combo-entry',fieldLabel: _('vp_entry'), name: 'entry', allowBlank: false, anchor: '99%', id: 'virtualpage-handler-entry-'+type}
+            ,{xtype: 'textarea', fieldLabel: _('vp_content'), name: 'content', anchor: '99%', id: 'virtualpage-handler-content-'+type}
             ,{xtype: 'textarea', fieldLabel: _('vp_description'), name: 'description', anchor: '99%', id: 'virtualpage-handler-description-'+type}
         );
 

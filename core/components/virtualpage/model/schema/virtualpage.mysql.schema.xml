@@ -32,7 +32,7 @@
 		<field key="name" dbtype="varchar" precision="255" phptype="string" null="false" />
 		<field key="type" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
 		<field key="entry" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
-
+		<field key="content" dbtype="text" phptype="string" null="true" />
 		<field key="description" dbtype="text" phptype="string" null="true" />
 		<field key="rank" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="true" default="0" />
 		<field key="active" dbtype="tinyint" precision="1" phptype="integer" null="true" default="1" />

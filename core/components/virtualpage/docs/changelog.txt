@@ -1,5 +1,10 @@
 Changelog for virtualpage.
 
+1.0.4-beta
+==============
+- add option placeholder in route
+- add "dinamic resource" in method handler
+
 1.0.3-beta
 ==============
 - small fix

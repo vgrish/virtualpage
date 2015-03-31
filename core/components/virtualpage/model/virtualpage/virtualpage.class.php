@@ -153,7 +153,9 @@ class virtualpage {
 		}
 		$type = $handler->get('type');
 		$entry = $handler->get('entry');
+		$content = $handler->get('content');
 		$prefix = $this->modx->getOption('virtualpage_prefix_placeholder', null, 'vp.');
+		$data['description'] = $handler->get('description');
 		$this->modx->setPlaceholders($data, $prefix);
 		$output = '';
 		switch ($type) {
@@ -161,10 +163,13 @@ class virtualpage {
 				$this->modx->sendForward($entry);
 				break;
 			case 1:
-				$output = $this->process('modSnippet', $entry, $data);
+				$output = $this->process('modSnippet', $entry, $data, $content);
 				break;
 			case 2:
-				$output = $this->process('modChunk', $entry, $data);
+				$output = $this->process('modChunk', $entry, $data, $content);
+				break;
+			case 3:
+				$output = $this->process('modResource', $entry, $data, $content);
 				break;
 			default:
 				$output = $this->error();
@@ -372,19 +377,41 @@ class virtualpage {
 	 *
 	 * @return string
 	 */
-	public function process($object = 'modSnippet', $entry) {
+	public function process($object = 'modSnippet', $entry, $data, $content) {
 		$output = '';
-		if ($snippet = $this->modx->getObject($object, $entry)) {
-			$snippet->_cacheable = false;
-			$snippet->_processed = false;
-			$properties = $snippet->getProperties();
-			$output = $snippet->process($properties);
-			if (strpos($output, '[[') !== false) {
-				$maxIterations= intval($this->modx->getOption('parser_max_iterations', null, 10));
-				$this->modx->parser->processElementTags('', $output, true, false, '[[', ']]', array(), $maxIterations);
-				$this->modx->parser->processElementTags('', $output, true, true, '[[', ']]', array(), $maxIterations);
+		switch ($object) {
+			case 'modResource': {
+				$res = $this->modx->newObject('modResource');
+				$res->set('id', $this->modx->getOption('site_start'));
+				$res->fromArray(array(
+					'pagetitle' => $data['description'],
+					'template' => $entry,
+					'content' => $content
+				));
+				$this->modx->resource = $res;
+				$this->modx->getResponse();
+				$output = $this->modx->response->outputContent();
+				break;
 			}
+			case 'modChunk':
+			case 'modSnippet': {
+				if($snippet = $this->modx->getObject($object, $entry)) {
+					$snippet->_cacheable = false;
+					$snippet->_processed = false;
+					$properties = $snippet->getProperties();
+					$output = $snippet->process($properties);
+					if (strpos($output, '[[') !== false) {
+						$maxIterations= intval($this->modx->getOption('parser_max_iterations', null, 10));
+						$this->modx->parser->processElementTags('', $output, true, false, '[[', ']]', array(), $maxIterations);
+						$this->modx->parser->processElementTags('', $output, true, true, '[[', ']]', array(), $maxIterations);
+					}
+				}
+				break;
+			}
+			default:
+				break;
 		}
+
 		return $output;
 	}
 

@@ -24,6 +24,7 @@ $_lang['vp_id'] = 'Id';
 $_lang['vp_name'] = 'Name';
 
 $_lang['vp_active'] = 'Active';
+$_lang['vp_content'] = 'Content';
 $_lang['vp_description'] = 'Description';
 $_lang['vp_num'] = 'Num';
 $_lang['vp_status'] = 'Status';
@@ -42,6 +43,7 @@ $_lang['vp_type'] = 'Type';
 $_lang['vp_entry'] = 'Entry';
 
 $_lang['vp_type_resource'] = 'Resource';
+$_lang['vp_type_dynamic_resource'] = 'Dynamic resource';
 $_lang['vp_type_snippet'] = 'Snippet';
 $_lang['vp_type_chunk'] = 'Chunk';
 

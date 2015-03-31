@@ -17,7 +17,8 @@ class vpRouteUpdateProcessor extends modObjectUpdateProcessor {
 		if ($this->modx->getObject('vpRoute',array(
 			'route' => $this->getProperty('route'),
 			'metod' => $this->getProperty('metod'),
-			'id:!=' => $this->getProperty('id')
+			'id:!=' => $this->getProperty('id'),
+			'active' => 1
 		))) {
 			$this->modx->error->addField('route', $this->modx->lexicon('vp_err_ae'));
 		}

@@ -39,6 +39,10 @@ class vpHandlerGetListProcessor extends modObjectGetListProcessor {
 				$n = 'vp_type_chunk';
 				break;
 			}
+			case 3: {
+				$n = 'vp_type_dynamic_resource';
+				break;
+			}
 
 		}
 		$array['name_type'] = $this->modx->lexicon($n);

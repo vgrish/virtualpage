@@ -24,6 +24,7 @@ $_lang['vp_id'] = 'Id';
 $_lang['vp_name'] = 'Имя';
 
 $_lang['vp_active'] = 'Включен';
+$_lang['vp_content'] = 'Содержимое';
 $_lang['vp_description'] = 'Описание';
 $_lang['vp_num'] = 'Номер';
 $_lang['vp_status'] = 'Статус';
@@ -44,6 +45,7 @@ $_lang['vp_type'] = 'Тип';
 $_lang['vp_entry'] = 'Запись';
 
 $_lang['vp_type_resource'] = 'Ресурс';
+$_lang['vp_type_dynamic_resource'] = 'Динамический ресурс';
 $_lang['vp_type_snippet'] = 'Сниппет';
 $_lang['vp_type_chunk'] = 'Чанк';
 
