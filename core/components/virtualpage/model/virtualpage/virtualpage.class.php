@@ -322,8 +322,7 @@ class virtualpage {
 		$content = $data['content'];
 		$request = $data['request'];
 		unset($data['content'], $data['request']);
-		$prefix = $this->modx->getOption('virtualpage_prefix_placeholder', null, 'vp.');
-		$this->modx->setPlaceholders($data, $prefix);
+		$this->modx->setPlaceholders($data, $this->modx->getOption('virtualpage_prefix_placeholder', null, 'vp.'));
 		//
 		switch ($object) {
 			case 'sendForward': {
@@ -331,16 +330,13 @@ class virtualpage {
 				break;
 			}
 			case 'modResource': {
-				$res = $this->modx->newObject('modResource');
-				$res->set('id', $this->modx->getOption('site_start'));
-				$res->fromArray(array(
-					'pagetitle' => $description,
-					'template' => $entry,
-					'content' => $content
-				));
-				$this->modx->resource = $res;
-				$this->modx->getResponse();
-				$this->modx->response->outputContent();
+				$this->getResource(array(
+						'pagetitle' => $description,
+						'template' => $entry,
+						'content' => $content,
+						'request' => $request,
+					)
+				);
 				break;
 			}
 			case 'modChunk':
@@ -365,17 +361,138 @@ class virtualpage {
 		return $output;
 	}
 
+
+	/**
+	 * @param array $data
+	 * @return null|object
+	 */
+	public function newResource(array $data = array())
+	{
+		$res = $this->modx->newObject('modResource');
+		$res->fromArray($data);
+		if(!isset($data['id'])) {
+			$res->set('id', $this->modx->getOption('site_start'));
+		}
+
+		return $res;
+	}
+
+	/**
+	 * @param array $data
+	 */
+	public function getResource(array $data = array())
+	{
+		$key = md5(implode($data['request']));
+		$cacheKey = $this->config['cache_key'].'/web/resources/';
+		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
+		//
+		if(!empty($data['cache']) || empty($key)) {
+			$res = $this->newResource($data);
+			$this->modx->resource = $res;
+			$this->modx->getResponse();
+			$this->modx->response->outputContent();
+		}
+		else {
+			$cachedResource = $this->modx->cacheManager->get($key, $cacheOptions);
+			if (is_array($cachedResource) && array_key_exists('resource', $cachedResource) && is_array($cachedResource['resource'])) {
+				/** @var modResource $resource */
+				$resource = $this->modx->newObject($cachedResource['resourceClass']);
+				if ($resource) {
+					$resource->fromArray($cachedResource['resource'], '', true, true, true);
+					$resource->_content = $cachedResource['resource']['_content'];
+					if (isset($cachedResource['elementCache'])) $this->modx->elementCache = $cachedResource['elementCache'];
+					if (isset($cachedResource['sourceCache'])) $this->modx->sourceCache = $cachedResource['sourceCache'];
+					if ($resource->get('_jscripts')) $this->modx->jscripts = $this->modx->jscripts + $resource->get('_jscripts');
+					if ($resource->get('_sjscripts')) $this->modx->sjscripts = $this->modx->sjscripts + $resource->get('_sjscripts');
+					if ($resource->get('_loadedjscripts')) $this->modx->loadedjscripts = array_merge($this->modx->loadedjscripts, $resource->get('_loadedjscripts'));
+					$resource->setProcessed(true);
+				}
+				// from cache
+				$this->modx->resource = $resource;
+				$this->modx->request->prepareResponse();
+			}
+			else {
+				// create new
+				$res = $this->newResource($data);
+				$this->modx->resource = $res;
+			}
+			$this->modx->resource->_output = $this->modx->resource->process();
+			$this->modx->resource->_jscripts = $this->modx->jscripts;
+			$this->modx->resource->_sjscripts = $this->modx->sjscripts;
+			$this->modx->resource->_loadedjscripts = $this->modx->loadedjscripts;
+			/* collect any uncached element tags in the content and process them */
+			$this->modx->getParser();
+			$maxIterations = intval($this->modx->getOption('parser_max_iterations', null, 10));
+			$this->modx->parser->processElementTags('', $this->modx->resource->_output, true, false, '[[', ']]', array(), $maxIterations);
+			$this->modx->parser->processElementTags('', $this->modx->resource->_output, true, true, '[[', ']]', array(), $maxIterations);
+			//
+			if(($js = $this->modx->getRegisteredClientStartupScripts()) && (strpos($this->modx->resource->_output, '</head>') !== false)) {
+				/* change to just before closing </head> */
+				$this->modx->resource->_output = preg_replace("/(<\/head>)/i", $js . "\n\\1", $this->modx->resource->_output, 1);
+			}
+			/* Insert jscripts & html block into template - template must have a </body> tag */
+			if((strpos($this->modx->resource->_output, '</body>') !== false) && ($js = $this->modx->getRegisteredClientScripts())) {
+				$this->modx->resource->_output = preg_replace("/(<\/body>)/i", $js . "\n\\1", $this->modx->resource->_output, 1);
+			}
+			$totalTime = (microtime(true) - $this->modx->startTime);
+			$queryTime = $this->modx->queryTime;
+			$queryTime = sprintf("%2.4f s", $queryTime);
+			$queries = isset ($this->modx->executedQueries) ? $this->modx->executedQueries : 0;
+			$totalTime = sprintf("%2.4f s", $totalTime);
+			$phpTime = $totalTime - $queryTime;
+			$phpTime = sprintf("%2.4f s", $phpTime);
+			$source = $this->modx->resourceGenerated ? "database" : "cache";
+			$this->modx->resource->_output = str_replace("[^q^]", $queries, $this->modx->resource->_output);
+			$this->modx->resource->_output = str_replace("[^qt^]", $queryTime, $this->modx->resource->_output);
+			$this->modx->resource->_output = str_replace("[^p^]", $phpTime, $this->modx->resource->_output);
+			$this->modx->resource->_output = str_replace("[^t^]", $totalTime, $this->modx->resource->_output);
+			$this->modx->resource->_output = str_replace("[^s^]", $source, $this->modx->resource->_output);
+			// to cache
+			$obj = $this->modx->resource;
+			$results= array();
+			$results['resourceClass']= $obj->_class;
+			$results['resource']['_processed']= $obj->getProcessed();
+			$results['resource']= $obj->toArray('', true);
+			$results['resource']['_content']= $obj->_content;
+			if ($contentType = $obj->getOne('ContentType')) {
+				$results['contentType']= $contentType->toArray('', true);
+			}
+			if (!empty($this->modx->elementCache)) {
+				$results['elementCache']= $this->modx->elementCache;
+			}
+			if (!empty($this->modx->sourceCache)) {
+				$results['sourceCache']= $this->modx->sourceCache;
+			}
+			if (!empty($obj->_sjscripts)) {
+				$results['resource']['_sjscripts']= $obj->_sjscripts;
+			}
+			if (!empty($obj->_jscripts)) {
+				$results['resource']['_jscripts']= $obj->_jscripts;
+			}
+			if (!empty($obj->_loadedjscripts)) {
+				$results['resource']['_loadedjscripts']= $obj->_loadedjscripts;
+			}
+		}
+		if (!empty($results)) {
+			$lifetime = (integer) $this->getOption('cache_resource_expires', null, 0);
+			$this->modx->cacheManager->set($key, $results, $lifetime, $cacheOptions);
+		}
+		$output = $this->modx->resource->_output;
+		exit($output);
+	}
+
+
 	/**
 	 * @param $key
 	 * @param array $data
 	 * @return mixed
 	 */
-	public function setCache($key, $data = array())
+	public function setCache($key, $data = array(), $lifetime= 0)
 	{
 		if(empty($key)) {return $key;}
 		$cacheKey = $this->config['cache_key'];
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
-		$this->modx->cacheManager->set($key, $data, 0, $cacheOptions);
+		$this->modx->cacheManager->set($key, $data, $lifetime, $cacheOptions);
 
 		return $key;
 	}
@@ -390,7 +507,7 @@ class virtualpage {
 		if(empty($key)) {return $cached;}
 		$cacheKey = $this->config['cache_key'];
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
-		$cached = $this->modx->getCacheManager()->get($key, $cacheOptions);
+		$cached = $this->modx->cacheManager->get($key, $cacheOptions);
 
 		return $cached;
 	}
@@ -440,6 +557,12 @@ class virtualpage {
 	{
 		// get events
 		$this->getEvents();
+	}
+
+	public function OnBeforeCacheUpdate($sp)
+	{
+		// clear cache for resource
+		$this->clearCache('web');
 	}
 
 }

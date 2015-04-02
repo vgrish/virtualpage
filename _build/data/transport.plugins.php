@@ -9,6 +9,7 @@ $tmp = array(
 		'locked' => 0,
 		'events' => array(
 			'OnHandleRequest' => array(),
+			'OnBeforeCacheUpdate' => array(),
 		)
 	),
 	'vpEvent' => array(
