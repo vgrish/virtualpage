@@ -11,6 +11,7 @@ $xpdo_meta_map['vpHandler']= array (
     'entry' => 0,
     'content' => NULL,
     'description' => NULL,
+    'cache' => 0,
     'rank' => 0,
     'active' => 1,
   ),
@@ -52,6 +53,15 @@ $xpdo_meta_map['vpHandler']= array (
       'dbtype' => 'text',
       'phptype' => 'string',
       'null' => true,
+    ),
+    'cache' => 
+    array (
+      'dbtype' => 'tinyint',
+      'precision' => '1',
+      'attributes' => 'unsigned',
+      'phptype' => 'integer',
+      'null' => true,
+      'default' => 0,
     ),
     'rank' => 
     array (
