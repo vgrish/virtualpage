@@ -344,17 +344,12 @@ class virtualpage {
 			}
 			case 'modChunk':
 			case 'modSnippet': {
-				if($snippet = $this->modx->getObject($object, $entry)) {
-					$snippet->_cacheable = false;
-					$snippet->_processed = false;
-					$properties = $snippet->getProperties();
-					$output = $snippet->process($properties);
-					if (strpos($output, '[[') !== false) {
-						$maxIterations= intval($this->modx->getOption('parser_max_iterations', null, 10));
-						$this->modx->parser->processElementTags('', $output, true, false, '[[', ']]', array(), $maxIterations);
-						$this->modx->parser->processElementTags('', $output, true, true, '[[', ']]', array(), $maxIterations);
-					}
-				}
+				$output = $this->getSnippet(array(
+					'object' => $object,
+					'entry' => $entry,
+					'cache' => $cache,
+					'request' => $request,
+				));
 				break;
 			}
 			default:
@@ -382,12 +377,39 @@ class virtualpage {
 
 	public function getSnippet(array $data = array())
 	{
+		if(!array_key_exists('entry', $data)
+			|| !array_key_exists('object', $data)) {return '';}
+		$output = '';
+		$cacheOptions = array(
+			'path' => ($data['object'] =='modSnippet') ? 'snippet' : 'chunk',
+			'hash' => 1
+		);
+		$cacheOptions = array_merge($data['request'], $cacheOptions);
+		//
+		if(!empty($data['cache'])) {
+			$cachedSnippet = $this->getCache('', $cacheOptions);
+			if($cachedSnippet) {
+				return $cachedSnippet;
+			}
+		}
+		if($snippet = $this->modx->getObject($data['object'], $data['entry'])) {
+			$snippet->_cacheable = false;
+			$snippet->_processed = false;
+			$properties = $snippet->getProperties();
+			$properties = array_merge($properties, $data);
+			$output = $snippet->process($properties);
+			if (strpos($output, '[[') !== false) {
+				$maxIterations= intval($this->modx->getOption('parser_max_iterations', null, 10));
+				$this->modx->parser->processElementTags('', $output, true, false, '[[', ']]', array(), $maxIterations);
+				$this->modx->parser->processElementTags('', $output, true, true, '[[', ']]', array(), $maxIterations);
+			}
+		}
+		if(!empty($data['cache'])) {
+			$lifetime = (integer) $this->getOption('cache_resource_expires', null, 0);
+			$this->setCache('', $output, $lifetime, $cacheOptions);
+		}
 
-	}
-
-	public function getChunk(array $data = array())
-	{
-
+		return $output;
 	}
 
 	/**
@@ -564,7 +586,7 @@ class virtualpage {
 
 		return true;
 	}
-	
+
 	/**
 	 * Shorthand for load and run an processor in this component
 	 *
