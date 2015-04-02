@@ -38,7 +38,7 @@ virtualpage.grid.Handler = function(config) {
         ,baseParams: {
             action: 'mgr/settings/handler/getlist'
         }
-        ,fields: ['id', 'name', 'type', 'entry', 'content', 'description', 'active', 'name_type']
+        ,fields: ['id', 'name', 'type', 'entry', 'content', 'description', 'cache', 'active', 'name_type']
         ,autoHeight: true
         ,paging: true
         ,remoteSort: true
@@ -51,6 +51,7 @@ virtualpage.grid.Handler = function(config) {
             ,{header: _('vp_name'),dataIndex: 'name',width: 50, editor: {xtype: 'textfield', allowBlank: false}, sortable: true}
             ,{header: _('vp_type'),dataIndex: 'type',width:50, editor: {xtype:'virtualpage-combo-type', allowBlank: false}, sortable: true, renderer: virtualpage.utils.renderType}
             ,{header: _('vp_entry'),dataIndex: 'entry',width: 50, sortable: true}
+            ,{header: _('vp_cache'),dataIndex: 'cache',sortable:true, width:50, editor:{xtype:'combo-boolean', renderer:'boolean'}}
             ,{header: _('vp_active'),dataIndex: 'active',sortable:true, width:50, editor:{xtype:'combo-boolean', renderer:'boolean'}}
         ]
         ,tbar: [{
@@ -122,8 +123,8 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
         });
 
         this.windows.updateHandler.fp.getForm().reset();
-        this.windows.updateHandler.fp.getForm().setValues(r);
         this.windows.updateHandler.show(e.target);
+        this.windows.updateHandler.fp.getForm().setValues(r);
     }
 
     ,removeHandler: function(btn,e) {
@@ -201,9 +202,14 @@ Ext.extend(virtualpage.grid.Handler,MODx.grid.Grid,{
             ,{xtype: 'textarea', fieldLabel: _('vp_description'), name: 'description', anchor: '99%', id: 'virtualpage-handler-description-'+type}
         );
 
-        fields.push(
-            {xtype: 'xcheckbox', fieldLabel: '', boxLabel: _('vp_active'), name: 'active', id: 'virtualpage-handler-active-'+type}
-        );
+        fields.push({xtype: 'checkboxgroup'
+            ,columns: 2
+            ,items: [
+                {xtype: 'xcheckbox', fieldLabel: '', boxLabel: _('vp_active'), name: 'active', id: 'virtualpage-handler-active-'+type}
+                ,{xtype: 'xcheckbox', fieldLabel: '', boxLabel: _('vp_cache'), name: 'cache', id: 'virtualpage-handler-cache-'+type}
+            ]
+            ,id: 'msop2-product-option-group-'+type
+        });
 
         return fields;
     }

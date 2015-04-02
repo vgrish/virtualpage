@@ -29,6 +29,7 @@ $_lang['vp_description'] = 'Description';
 $_lang['vp_num'] = 'Num';
 $_lang['vp_status'] = 'Status';
 $_lang['vp_count'] = 'Count';
+$_lang['vp_cache'] = 'Cacheable';
 
 
 $_lang['vp_route'] = 'Route';

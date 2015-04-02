@@ -321,6 +321,7 @@ class virtualpage {
 		$output = '';
 		$description = $data['description'];
 		$content = $data['content'];
+		$cache = $data['cache'];
 		$request = $data['request'];
 		unset($data['content'], $data['request']);
 		$this->modx->setPlaceholders($data, $this->modx->getOption('virtualpage_prefix_placeholder', null, 'vp.'));
@@ -335,6 +336,7 @@ class virtualpage {
 						'pagetitle' => $description,
 						'template' => $entry,
 						'content' => $content,
+						'cache' => $cache,
 						'request' => $request,
 					)
 				);
@@ -376,6 +378,16 @@ class virtualpage {
 		}
 
 		return $res;
+	}
+
+	public function getSnippet(array $data = array())
+	{
+
+	}
+
+	public function getChunk(array $data = array())
+	{
+
 	}
 
 	/**
