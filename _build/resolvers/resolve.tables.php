@@ -24,9 +24,9 @@ if ($object->xpdo) {
 
 			$modx->setLogLevel(xPDO::LOG_LEVEL_FATAL);
 			$manager->addField('vpHandler', 'content', array('after' => 'entry'));
+			$manager->addField('vpHandler', 'cache', array('after' => 'description'));
 
 			$modx->setLogLevel($level);
-
 
 			break;
 

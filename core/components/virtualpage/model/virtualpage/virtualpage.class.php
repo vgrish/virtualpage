@@ -141,6 +141,7 @@ class virtualpage {
 		$entry = $handler->get('entry');
 		$data['description'] = $handler->get('description');
 		$data['content'] = $handler->get('content');
+		$data['cache'] = $handler->get('cache');
 		$data['request'] = $_REQUEST;
 		$output = '';
 		switch ($type) {
@@ -386,7 +387,7 @@ class virtualpage {
 		$cacheKey = $this->config['cache_key'].'/web/resources/';
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
 		//
-		if(!empty($data['cache']) || empty($key)) {
+		if(empty($data['cache']) || empty($key)) {
 			$res = $this->newResource($data);
 			$this->modx->resource = $res;
 			$this->modx->getResponse();
@@ -561,8 +562,8 @@ class virtualpage {
 
 	public function OnBeforeCacheUpdate($sp)
 	{
-		// clear cache for resource
-		$this->clearCache('web');
+		// clear cache
+		$this->clearCache();
 	}
 
 }
