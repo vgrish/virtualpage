@@ -3,7 +3,7 @@ Changelog for virtualpage.
 1.0.5-beta
 ==============
 - add cache for "dinamic resource"
-- small fix
+- small fix 
 
 1.0.4-beta
 ==============
