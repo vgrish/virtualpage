@@ -23,7 +23,7 @@ class vpRouteRemoveProcessor extends modObjectRemoveProcessor  {
 			// remove event
 			$this->modx->virtualpage->doEvent('remove', $this->eventName, 'vpEvent', 10);
 		}
-		$this->modx->virtualpage->clearCache('route');
+		$this->modx->virtualpage->clearCache();
 
 		return parent::afterRemove();
 	}

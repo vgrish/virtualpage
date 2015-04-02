@@ -395,18 +395,20 @@ class virtualpage {
 	 */
 	public function getResource(array $data = array())
 	{
-		$key = md5(implode($data['request']));
-		$cacheKey = $this->config['cache_key'].'/web/resources/';
-		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
+		$cacheOptions = array(
+			'path' => 'resource',
+			'hash' => 1
+		);
+		$cacheOptions = array_merge($data['request'], $cacheOptions);
 		//
-		if(empty($data['cache']) || empty($key)) {
+		if(empty($data['cache'])) {
 			$res = $this->newResource($data);
 			$this->modx->resource = $res;
 			$this->modx->getResponse();
 			$this->modx->response->outputContent();
 		}
 		else {
-			$cachedResource = $this->modx->cacheManager->get($key, $cacheOptions);
+			$cachedResource = $this->getCache('', $cacheOptions);
 			if (is_array($cachedResource) && array_key_exists('resource', $cachedResource) && is_array($cachedResource['resource'])) {
 				/** @var modResource $resource */
 				$resource = $this->modx->newObject($cachedResource['resourceClass']);
@@ -488,39 +490,62 @@ class virtualpage {
 		}
 		if (!empty($results)) {
 			$lifetime = (integer) $this->getOption('cache_resource_expires', null, 0);
-			$this->modx->cacheManager->set($key, $results, $lifetime, $cacheOptions);
+			$this->setCache('', $results, $lifetime, $cacheOptions);
 		}
 		$output = $this->modx->resource->_output;
 		exit($output);
 	}
 
-
 	/**
 	 * @param $key
 	 * @param array $data
-	 * @return mixed
+	 * @param int $lifetime
+	 * @param array $options
+	 *
+	 * @return string
 	 */
-	public function setCache($key, $data = array(), $lifetime= 0)
+	public function setCache($key, $data = array(), $lifetime= 0, $options = array())
 	{
-		if(empty($key)) {return $key;}
 		$cacheKey = $this->config['cache_key'];
+		if(array_key_exists('path', $options)){
+			$cacheKey .= $options['path'].'/';
+		}
+		if(array_key_exists('hash', $options)){
+			$key = sha1(serialize($options + array($key)));
+		}
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
-		$this->modx->cacheManager->set($key, $data, $lifetime, $cacheOptions);
+		if (!empty($key) && !empty($cacheOptions) && $this->modx->getCacheManager()) {
+			$this->modx->cacheManager->set(
+				$key,
+				$data,
+				(integer) $lifetime,
+				$cacheOptions
+			);
+		}
 
 		return $key;
 	}
 
 	/**
 	 * @param $key
+	 * @param array $options
+	 *
 	 * @return mixed|string
 	 */
-	public function getCache($key)
+	public function getCache($key, $options = array())
 	{
-		$cached = '';
-		if(empty($key)) {return $cached;}
 		$cacheKey = $this->config['cache_key'];
+		if(array_key_exists('path', $options)){
+			$cacheKey .= $options['path'].'/';
+		}
+		if(array_key_exists('hash', $options)){
+			$key = sha1(serialize($options + array($key)));
+		}
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
-		$cached = $this->modx->cacheManager->get($key, $cacheOptions);
+		$cached = '';
+		if (!empty($key) && !empty($cacheOptions) && $this->modx->getCacheManager()) {
+			$cached = $this->modx->cacheManager->get($key, $cacheOptions);
+		}
 
 		return $cached;
 	}
@@ -529,16 +554,17 @@ class virtualpage {
 	 * @param $key
 	 * @return mixed
 	 */
-	public function clearCache($key = 'event')
+	public function clearCache()
 	{
-		if(empty($key)) {return $key;}
 		$cacheKey = $this->config['cache_key'];
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
-		$this->modx->cacheManager->clean($cacheOptions);
+		if (!empty($cacheOptions) && $this->modx->getCacheManager()) {
+			$this->modx->cacheManager->clean($cacheOptions);
+		}
 
-		return $key;
+		return true;
 	}
-
+	
 	/**
 	 * Shorthand for load and run an processor in this component
 	 *

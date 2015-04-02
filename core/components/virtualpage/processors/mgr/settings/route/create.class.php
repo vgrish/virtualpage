@@ -36,8 +36,7 @@ class vpRouteCreateProcessor extends modObjectCreateProcessor {
 			// set event
 			$this->modx->virtualpage->doEvent('create', $eventName, 'vpEvent', 10);
 		}
-		$this->modx->virtualpage->clearCache('route');
-		$this->modx->virtualpage->clearCache('fastrouter');
+		$this->modx->virtualpage->clearCache();
 
 		return parent::afterSave();
 	}

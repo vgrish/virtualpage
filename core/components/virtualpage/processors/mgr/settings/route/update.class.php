@@ -36,9 +36,7 @@ class vpRouteUpdateProcessor extends modObjectUpdateProcessor {
 	}
 	/** {@inheritDoc} */
 	public function afterSave() {
-		$this->modx->virtualpage->clearCache('event');
-		$this->modx->virtualpage->clearCache('route');
-		$this->modx->virtualpage->clearCache('fastrouter');
+		$this->modx->virtualpage->clearCache();
 		//
 		if($event = $this->modx->getObject('vpEvent', $this->object->get('event'))) {
 			$eventName = $event->get('name');
