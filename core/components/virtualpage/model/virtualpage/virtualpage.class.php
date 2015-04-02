@@ -501,7 +501,7 @@ class virtualpage {
 		}
 		if (!empty($results)) {
 			$lifetime = $this->getOption('cache_resource_expires', null, 0);
-			$this->setCache('', $results, $lifetime, $cacheOptions);
+			$this->setCache('', $results, $lifetime, $cacheOptions); 
 		}
 		$output = $this->modx->resource->_output;
 		exit($output);
