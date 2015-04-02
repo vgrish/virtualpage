@@ -359,22 +359,11 @@ class virtualpage {
 		return $output;
 	}
 
-
 	/**
 	 * @param array $data
-	 * @return null|object
+	 *
+	 * @return mixed|string
 	 */
-	public function newResource(array $data = array())
-	{
-		$res = $this->modx->newObject('modResource');
-		$res->fromArray($data);
-		if(!isset($data['id'])) {
-			$res->set('id', $this->modx->getOption('site_start'));
-		}
-
-		return $res;
-	}
-
 	public function getSnippet(array $data = array())
 	{
 		if(!array_key_exists('entry', $data)
@@ -405,7 +394,7 @@ class virtualpage {
 			}
 		}
 		if(!empty($data['cache'])) {
-			$lifetime = (integer) $this->getOption('cache_resource_expires', null, 0);
+			$lifetime = $this->getOption('cache_resource_expires', null, 0);
 			$this->setCache('', $output, $lifetime, $cacheOptions);
 		}
 
@@ -511,11 +500,26 @@ class virtualpage {
 			}
 		}
 		if (!empty($results)) {
-			$lifetime = (integer) $this->getOption('cache_resource_expires', null, 0);
+			$lifetime = $this->getOption('cache_resource_expires', null, 0);
 			$this->setCache('', $results, $lifetime, $cacheOptions);
 		}
 		$output = $this->modx->resource->_output;
 		exit($output);
+	}
+
+	/**
+	 * @param array $data
+	 * @return null|object
+	 */
+	public function newResource(array $data = array())
+	{
+		$res = $this->modx->newObject('modResource');
+		$res->fromArray($data);
+		if(!isset($data['id'])) {
+			$res->set('id', $this->modx->getOption('site_start'));
+		}
+
+		return $res;
 	}
 
 	/**
@@ -620,6 +624,9 @@ class virtualpage {
 		$this->getEvents();
 	}
 
+	/**
+	 * @param $sp
+	 */
 	public function OnBeforeCacheUpdate($sp)
 	{
 		// clear cache
