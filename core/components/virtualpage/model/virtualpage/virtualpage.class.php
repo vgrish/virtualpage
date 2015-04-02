@@ -139,23 +139,22 @@ class virtualpage {
 		$_REQUEST += array($this->fastrouterKey => $data);
 		$type = $handler->get('type');
 		$entry = $handler->get('entry');
-		$content = $handler->get('content');
-		$prefix = $this->modx->getOption('virtualpage_prefix_placeholder', null, 'vp.');
 		$data['description'] = $handler->get('description');
-		$this->modx->setPlaceholders($data, $prefix);
+		$data['content'] = $handler->get('content');
+		$data['request'] = $_REQUEST;
 		$output = '';
 		switch ($type) {
 			case 0:
-				$this->modx->sendForward($entry);
+				$output = $this->process('sendForward', $entry, $data);
 				break;
 			case 1:
-				$output = $this->process('modSnippet', $entry, $data, $content);
+				$output = $this->process('modSnippet', $entry, $data);
 				break;
 			case 2:
-				$output = $this->process('modChunk', $entry, $data, $content);
+				$output = $this->process('modChunk', $entry, $data);
 				break;
 			case 3:
-				$output = $this->process('modResource', $entry, $data, $content);
+				$output = $this->process('modResource', $entry, $data);
 				break;
 			default:
 				$output = $this->error();
@@ -317,14 +316,25 @@ class virtualpage {
 	 *
 	 * @return string
 	 */
-	public function process($object = 'modSnippet', $entry, $data, $content) {
+	public function process($object = 'modSnippet', $entry, $data) {
 		$output = '';
+		$description = $data['description'];
+		$content = $data['content'];
+		$request = $data['request'];
+		unset($data['content'], $data['request']);
+		$prefix = $this->modx->getOption('virtualpage_prefix_placeholder', null, 'vp.');
+		$this->modx->setPlaceholders($data, $prefix);
+		//
 		switch ($object) {
+			case 'sendForward': {
+				$this->modx->sendForward($entry);
+				break;
+			}
 			case 'modResource': {
 				$res = $this->modx->newObject('modResource');
 				$res->set('id', $this->modx->getOption('site_start'));
 				$res->fromArray(array(
-					'pagetitle' => $data['description'],
+					'pagetitle' => $description,
 					'template' => $entry,
 					'content' => $content
 				));
