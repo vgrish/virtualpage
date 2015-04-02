@@ -102,9 +102,9 @@ class virtualpage {
 		$dispatcher = $this->getDispatcher();
 		$params = $dispatcher->dispatch($this->getMethod(), $uri);
 		switch ($params[0]) {
-			case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+			/*case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
 				return $this->error();
-				break;
+				break;*/
 			case FastRoute\Dispatcher::FOUND:
 				$properties = $this->getCache('properties');
 				foreach($ids as $id => $z) {
@@ -170,7 +170,7 @@ class virtualpage {
 	 */
 	public function generateRouteArray($ids)
 	{
-		$key = 'route';
+		$key = 'route.'.$this->event;
 		$routes = $this->getCache($key);
 		if(!empty($routes)) {return $routes;}
 		$match = $properties = array();
