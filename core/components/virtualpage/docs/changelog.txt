@@ -1,5 +1,9 @@
 Changelog for virtualpage.
 
+1.0.7-beta
+==============
+- update FastRoute
+
 1.0.6-beta
 ==============
 - add cache for "chunk, snippet"
