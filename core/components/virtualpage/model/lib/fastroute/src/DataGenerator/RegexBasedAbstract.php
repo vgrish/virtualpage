@@ -51,7 +51,7 @@ abstract class RegexBasedAbstract implements DataGenerator {
     private function addStaticRoute($httpMethod, $routeData, $handler) {
         $routeStr = $routeData[0];
 
-        if (isset($this->staticRoutes[$routeStr][$httpMethod])) {
+        if (isset($this->staticRoutes[$httpMethod][$routeStr])) {
             throw new BadRouteException(sprintf(
                 'Cannot register two routes matching "%s" for method "%s"',
                 $routeStr, $httpMethod
@@ -69,7 +69,7 @@ abstract class RegexBasedAbstract implements DataGenerator {
             }
         }
 
-        $this->staticRoutes[$routeStr][$httpMethod] = $handler;
+        $this->staticRoutes[$httpMethod][$routeStr] = $handler;
     }
 
     private function addVariableRoute($httpMethod, $routeData, $handler) {
@@ -104,10 +104,41 @@ abstract class RegexBasedAbstract implements DataGenerator {
                 ));
             }
 
+            if ($this->regexHasCapturingGroups($regexPart)) {
+                throw new BadRouteException(sprintf(
+                    'Regex "%s" for parameter "%s" contains a capturing group',
+                    $regexPart, $varName
+                ));
+            }
+
             $variables[$varName] = $varName;
             $regex .= '(' . $regexPart . ')';
         }
 
         return [$regex, $variables];
+    }
+
+    private function regexHasCapturingGroups($regex) {
+        if (false === strpos($regex, '(')) {
+            // Needs to have at least a ( to contain a capturing group
+            return false;
+        }
+
+        // Semi-accurate detection for capturing groups
+        return preg_match(
+            '~
+                (?:
+                    \(\?\(
+                  | \[ [^\]\\\\]* (?: \\\\ . [^\]\\\\]* )* \]
+                  | \\\\ .
+                ) (*SKIP)(*FAIL) |
+                \(
+                (?!
+                    \? (?! <(?![!=]) | P< | \' )
+                  | \*
+                )
+            ~x',
+            $regex
+        );
     }
 }

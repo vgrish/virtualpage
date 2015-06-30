@@ -31,10 +31,10 @@ abstract class DispatcherTest extends \PHPUnit_Framework_TestCase {
      */
     public function testFoundDispatches($method, $uri, $callback, $handler, $argDict) {
         $dispatcher = \FastRoute\simpleDispatcher($callback, $this->generateDispatcherOptions());
-        list($routedStatus, $routedTo, $routedArgs) = $dispatcher->dispatch($method, $uri);
-        $this->assertSame($dispatcher::FOUND, $routedStatus);
-        $this->assertSame($handler, $routedTo);
-        $this->assertSame($argDict, $routedArgs);
+        $info = $dispatcher->dispatch($method, $uri);
+        $this->assertSame($dispatcher::FOUND, $info[0]);
+        $this->assertSame($handler, $info[1]);
+        $this->assertSame($argDict, $info[2]);
     }
 
     /**
@@ -42,11 +42,11 @@ abstract class DispatcherTest extends \PHPUnit_Framework_TestCase {
      */
     public function testNotFoundDispatches($method, $uri, $callback) {
         $dispatcher = \FastRoute\simpleDispatcher($callback, $this->generateDispatcherOptions());
+        $routeInfo = $dispatcher->dispatch($method, $uri);
         $this->assertFalse(isset($routeInfo[1]),
             "NOT_FOUND result must only contain a single element in the returned info array"
         );
-        list($routedStatus) = $dispatcher->dispatch($method, $uri);
-        $this->assertSame($dispatcher::NOT_FOUND, $routedStatus);
+        $this->assertSame($dispatcher::NOT_FOUND, $routeInfo[0]);
     }
 
     /**
@@ -104,6 +104,16 @@ abstract class DispatcherTest extends \PHPUnit_Framework_TestCase {
         \FastRoute\simpleDispatcher(function(RouteCollector $r) {
             $r->addRoute('GET', '/user/{name}', 'handler0');
             $r->addRoute('GET', '/user/nikic', 'handler1');
+        }, $this->generateDispatcherOptions());
+    }
+
+    /**
+     * @expectedException \FastRoute\BadRouteException
+     * @expectedExceptionMessage Regex "(en|de)" for parameter "lang" contains a capturing group
+     */
+    public function testCapturing() {
+        \FastRoute\simpleDispatcher(function(RouteCollector $r) {
+            $r->addRoute('GET', '/{lang:(en|de)}', 'handler0');
         }, $this->generateDispatcherOptions());
     }
 
@@ -308,6 +318,15 @@ abstract class DispatcherTest extends \PHPUnit_Framework_TestCase {
         $cases[] = ['POST', '/user', $callback, 'handlerGetPost', $argDict];
         $cases[] = ['DELETE', '/user', $callback, 'handlerDelete', $argDict];
 
+        // 15 ----
+
+        $callback = function(RouteCollector $r) {
+            $r->addRoute('POST', '/user.json', 'handler0');
+            $r->addRoute('GET', '/{entity}.json', 'handler1');
+        };
+
+        $cases[] = ['GET', '/user.json', $callback, 'handler1', ['entity' => 'user']];
+
 
         // x -------------------------------------------------------------------------------------->
 
@@ -457,6 +476,15 @@ abstract class DispatcherTest extends \PHPUnit_Framework_TestCase {
         };
 
         $cases[] = ['PUT', '/user', $callback, ['GET', 'POST', 'DELETE']];
+
+        // 5
+
+        $callback = function(RouteCollector $r) {
+            $r->addRoute('POST', '/user.json', 'handler0');
+            $r->addRoute('GET', '/{entity}.json', 'handler1');
+        };
+
+        $cases[] = ['PUT', '/user.json', $callback, ['POST', 'GET']];
 
         // x -------------------------------------------------------------------------------------->
 
