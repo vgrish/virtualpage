@@ -3,6 +3,7 @@ Changelog for virtualpage.
 1.0.8-beta
 ==============
 - add check site status
+- refactoring js (grid, window, handler)
 
 1.0.7-beta
 ==============
