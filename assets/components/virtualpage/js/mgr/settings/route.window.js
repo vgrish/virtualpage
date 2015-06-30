@@ -66,7 +66,18 @@ Ext.extend(virtualpage.window.UpdateRoute, MODx.Window, {
             xtype: 'textarea',
             fieldLabel: _('vp_description'),
             name: 'description',
-            anchor: '99.5%'
+            anchor: '99.5%',
+            height: 50
+        },{
+            xtype: 'checkboxgroup',
+            columns: 4,
+            items: [{
+                xtype: 'xcheckbox',
+                fieldLabel: '',
+                boxLabel: _('vp_active'),
+                name: 'active',
+                checked: config.record.active
+            }]
         }];
     },
 
@@ -93,16 +104,6 @@ Ext.extend(virtualpage.window.UpdateRoute, MODx.Window, {
             name: 'handler',
             anchor: '99%',
             allowBlank: false
-        },{
-            xtype: 'checkboxgroup',
-            columns: 2,
-            items: [{
-                xtype: 'xcheckbox',
-                fieldLabel: '',
-                boxLabel: _('vp_active'),
-                name: 'active',
-                checked: config.record.active
-            }]
         }];
     }
 

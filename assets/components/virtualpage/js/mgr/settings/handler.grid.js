@@ -51,82 +51,102 @@ virtualpage.grid.Handler = function(config) {
         baseParams: {
             action: 'mgr/settings/handler/getlist'
         },
-        fields: ['id', 'name', 'type', 'entry', 'content', 'description', 'cache', 'active', 'name_type'],
-        autoHeight: true,
+        fields: this.getFields(config),
+        columns: this.getColumns(config),
+        tbar: this.getTopBar(config),
+        listeners: this.getListeners(config),
         paging: true,
         remoteSort: true,
+        autoHeight: true,
         save_action: 'mgr/settings/handler/updatefromgrid',
         autosave: true,
         save_callback: this.updateRow,
         plugins: this.exp,
-        columns: [this.exp, {
-            header: _('vp_id'),
-            dataIndex: 'id',
-            width: 50,
-            sortable: true
-        }, {
-            header: _('vp_name'),
-            dataIndex: 'name',
-            width: 50,
-            editor: {
-                xtype: 'textfield',
-                allowBlank: false
-            },
-            sortable: true
-        }, {
-            header: _('vp_type'),
-            dataIndex: 'type',
-            width: 50,
-            editor: {
-                xtype: 'virtualpage-combo-type',
-                allowBlank: false
-            },
-            sortable: true,
-            renderer: virtualpage.utils.renderType
-        }, {
-            header: _('vp_entry'),
-            dataIndex: 'entry',
-            width: 50,
-            sortable: true
-        }, {
-            header: _('vp_cache'),
-            dataIndex: 'cache',
-            sortable: true,
-            width: 50,
-            editor: {
-                xtype: 'combo-boolean',
-                renderer: 'boolean'
-            }
-        }, {
-            header: _('vp_active'),
-            dataIndex: 'active',
-            sortable: true,
-            width: 50,
-            editor: {
-                xtype: 'combo-boolean',
-                renderer: 'boolean'
-            }
-        }],
-        tbar: [{
-            text: _('vp_btn_create'),
-            handler: this.createHandler,
-            scope: this
-        }],
         ddGroup: 'dd',
-        enableDragDrop: true,
-        listeners: {
-            render: {
-                fn: this.dd,
-                scope: this
-            }
-        }
+        enableDragDrop: true
     });
     virtualpage.grid.Handler.superclass.constructor.call(this, config);
 };
 Ext.extend(virtualpage.grid.Handler, MODx.grid.Grid, {
-    windows: {}
+    windows: {},
 
-    ,
+    getFields: function(config) {
+        var fields = ['id', 'name', 'type', 'entry', 'content', 'description', 'cache', 'active', 'name_type'];
+
+        return fields;
+    },
+
+    getColumns: function(config) {
+        var columns = [this.exp];
+        var add = {
+            id: {
+                width: 25,
+                sortable: true
+            },
+            name: {
+                width: 50,
+                sortable: true,
+                editor: {
+                    xtype: 'textfield',
+                    allowBlank: false
+                }
+            },
+            type: {
+                width: 50,
+                sortable: true,
+                editor: {
+                    xtype: 'virtualpage-combo-type',
+                    allowBlank: false
+                },
+                renderer: virtualpage.utils.renderType
+            },
+            entry: {
+                width: 50,
+                sortable: true
+            },
+            cache: {
+                width: 35,
+                sortable: false,
+                editor: {
+                    xtype: 'combo-boolean',
+                    renderer: 'boolean'
+                }
+            },
+            active: {
+                width: 35,
+                sortable: false,
+                editor: {
+                    xtype: 'combo-boolean',
+                    renderer: 'boolean'
+                }
+            }
+        };
+
+        for (var field in add) {
+            if (add[field]) {
+                Ext.applyIf(add[field], {
+                    header: _('vp_' + field),
+                    tooltip: _('vp_tooltip_' + field),
+                    dataIndex: field
+                });
+                columns.push(add[field]);
+            }
+        }
+
+        return columns;
+    },
+
+    getTopBar: function(config) {
+        var tbar = [];
+        tbar.push({
+            text: _('vp_btn_create'),
+            handler: this.createHandler,
+            scope: this
+        });
+
+        return tbar;
+    },
+
     getMenu: function() {
         var m = [];
         m.push({
@@ -139,67 +159,79 @@ Ext.extend(virtualpage.grid.Handler, MODx.grid.Grid, {
             handler: this.removeHandler
         });
         this.addContextMenuItem(m);
-    }
+    },
 
-    ,
+    getListeners: function(config) {
+        var listeners = {};
+        listeners.render = {fn: this.dd, scope: this};
+
+        return listeners;
+    },
+
     updateRow: function(response) {
-        Ext.getCmp('virtualpage-grid-handler').refresh();
-    }
+        this.refresh();
+    },
 
-    ,
     createHandler: function(btn, e) {
-        if (!this.windows.createHandler) {
-            this.windows.createHandler = MODx.load({
-                xtype: 'virtualpage-window-handler-create',
-                fields: this.getHandlerFields('create'),
-                listeners: {
-                    success: {
-                        fn: function() {
-                            this.refresh();
-                        },
-                        scope: this
-                    }
-                }
-            });
-        }
-        this.windows.createHandler.fp.getForm().reset();
-        this.windows.createHandler.fp.getForm().setValues({
+        var record = {
             type: 0,
             active: 1
-        });
-        this.windows.createHandler.show(e.target);
-    }
-
-    ,
-    updateHandler: function(btn, e) {
-        if (!this.menu.record || !this.menu.record.id) return false;
-        var r = this.menu.record;
-        if (this.windows.updateHandler) {
-            try {
-                this.windows.updateHandler.close();
-                this.windows.updateHandler.destroy();
-            } catch (e) {}
+        };
+        var w = Ext.getCmp('virtualpage-window-handler-create');
+        if (w) {
+            w.hide().getEl().remove();
         }
-        this.windows.updateHandler = MODx.load({
+        w = MODx.load({
             xtype: 'virtualpage-window-handler-update',
-            record: r,
-            fields: this.getHandlerFields('update'),
+            title: _('vp_menu_create'),
+            action: 'mgr/settings/handler/create',
+            record: record,
+            id: 'virtualpage-window-handler-create',
             listeners: {
                 success: {
-                    fn: function() {
-                        this.refresh();
+                    fn: this.refresh,
+                    scope: this
+                }
+            }
+        });
+        w.fp.getForm().reset();
+        w.fp.getForm().setValues(record);
+        w.show(e.target);
+    },
+
+    updateHandler: function(btn, e, row) {
+        var record = typeof(row) != 'undefined' ? row.data : this.menu.record;
+
+        MODx.Ajax.request({
+            url: virtualpage.config.connector_url,
+            params: {
+                action: 'mgr/settings/handler/get',
+                id: record.id
+            },
+            listeners: {
+                success: {
+                    fn: function(r) {
+                        var record = r.object;
+                        var w = MODx.load({
+                            xtype: 'virtualpage-window-handler-update',
+                            record: record,
+                            listeners: {
+                                success: {
+                                    fn: this.refresh,
+                                    scope: this
+                                }
+                            }
+                        });
+                        w.fp.getForm().reset();
+                        w.fp.getForm().setValues(record);
+                        w.show(e.target);
                     },
                     scope: this
                 }
             }
         });
+    },
 
-        this.windows.updateHandler.fp.getForm().reset();
-        this.windows.updateHandler.show(e.target);
-        this.windows.updateHandler.fp.getForm().setValues(r);
-    }
-
-    ,
     removeHandler: function(btn, e) {
         if (!this.menu.record) return false;
 
@@ -222,188 +254,5 @@ Ext.extend(virtualpage.grid.Handler, MODx.grid.Grid, {
         });
     }
 
-    ,
-    handleChangeType: function(type, change) {
-        var el = Ext.getCmp('virtualpage-handler-type-' + type);
-        var entry = Ext.getCmp('virtualpage-handler-entry-' + type);
-        var content = Ext.getCmp('virtualpage-handler-content-' + type);
-
-        if (type !== 'update') {
-            entry.reset();
-        }
-        if ((change == 1) || (change == '1')) {
-            entry.clearValue();
-            entry.reset();
-        }
-
-        switch (el.value) {
-            case 0:
-            case '0':
-            {
-                entry.baseParams.element = 'resource';
-                content.disable().hide();
-                break;
-            }
-            case 1:
-            case '1':
-            {
-                entry.baseParams.element = 'snippet';
-                content.disable().hide();
-                break;
-            }
-            case 2:
-            case '2':
-            {
-                entry.baseParams.element = 'chunk';
-                content.disable().hide();
-                break;
-            }
-            case 3:
-            case '3':
-            {
-                entry.baseParams.element = 'template';
-                content.enable().show();
-                break;
-            }
-        }
-        entry.store.load();
-
-    }
-
-    ,
-    getHandlerFields: function(type) {
-        var fields = [];
-
-        fields.push({
-            xtype: 'hidden',
-            name: 'id',
-            id: 'virtualpage-handler-id-' + type
-        }, {
-            xtype: 'textfield',
-            fieldLabel: _('vp_name'),
-            name: 'name',
-            allowBlank: false,
-            anchor: '99%',
-            id: 'virtualpage-handler-name-' + type
-        }, {
-            xtype: 'virtualpage-combo-type',
-            fieldLabel: _('vp_type'),
-            name: 'type',
-            allowBlank: false,
-            anchor: '99%',
-            id: 'virtualpage-handler-type-' + type,
-            listeners: {
-                afterrender: {
-                    fn: function(r) {
-                        this.handleChangeType(type, 0);
-                    },
-                    scope: this
-                },
-                select: {
-                    fn: function(r) {
-                        this.handleChangeType(type, 1);
-                    },
-                    scope: this
-                }
-            }
-        }, {
-            xtype: 'virtualpage-combo-entry',
-            fieldLabel: _('vp_entry'),
-            name: 'entry',
-            allowBlank: false,
-            anchor: '99%',
-            id: 'virtualpage-handler-entry-' + type
-        }, {
-            xtype: 'textarea',
-            fieldLabel: _('vp_content'),
-            name: 'content',
-            anchor: '99%',
-            id: 'virtualpage-handler-content-' + type
-        }, {
-            xtype: 'textarea',
-            fieldLabel: _('vp_description'),
-            name: 'description',
-            anchor: '99%',
-            id: 'virtualpage-handler-description-' + type
-        });
-
-        fields.push({
-            xtype: 'checkboxgroup',
-            columns: 2,
-            items: [{
-                xtype: 'xcheckbox',
-                fieldLabel: '',
-                boxLabel: _('vp_active'),
-                name: 'active',
-                id: 'virtualpage-handler-active-' + type
-            }, {
-                xtype: 'xcheckbox',
-                fieldLabel: '',
-                boxLabel: _('vp_cache'),
-                name: 'cache',
-                id: 'virtualpage-handler-cache-' + type
-            }],
-            id: 'msop2-product-option-group-' + type
-        });
-
-        return fields;
-    }
-
 });
 Ext.reg('virtualpage-grid-handler', virtualpage.grid.Handler);
-
-
-virtualpage.window.CreateHandler = function(config) {
-    config = config || {};
-    this.ident = config.ident || 'mecitem' + Ext.id();
-    Ext.applyIf(config, {
-        title: _('vp_menu_create'),
-        id: this.ident,
-        width: 600,
-        autoHeight: true,
-        labelAlign: 'left',
-        labelWidth: 180,
-        url: virtualpage.config.connector_url,
-        action: 'mgr/settings/handler/create',
-        fields: config.fields,
-        keys: [{
-            key: Ext.EventObject.ENTER,
-            shift: true,
-            fn: function() {
-                this.submit()
-            },
-            scope: this
-        }]
-    });
-    virtualpage.window.CreateHandler.superclass.constructor.call(this, config);
-};
-Ext.extend(virtualpage.window.CreateHandler, MODx.Window);
-Ext.reg('virtualpage-window-handler-create', virtualpage.window.CreateHandler);
-
-
-virtualpage.window.UpdateHandler = function(config) {
-    config = config || {};
-    this.ident = config.ident || 'meuitem' + Ext.id();
-    Ext.applyIf(config, {
-        title: _('vp_menu_update'),
-        id: this.ident,
-        width: 600,
-        autoHeight: true,
-        labelAlign: 'left',
-        labelWidth: 180,
-        url: virtualpage.config.connector_url,
-        action: 'mgr/settings/handler/update',
-        fields: config.fields,
-        keys: [{
-            key: Ext.EventObject.ENTER,
-            shift: true,
-            fn: function() {
-                this.submit()
-            },
-            scope: this
-        }]
-    });
-    virtualpage.window.UpdateHandler.superclass.constructor.call(this, config);
-};
-Ext.extend(virtualpage.window.UpdateHandler, MODx.Window);
-Ext.reg('virtualpage-window-handler-update', virtualpage.window.UpdateHandler);

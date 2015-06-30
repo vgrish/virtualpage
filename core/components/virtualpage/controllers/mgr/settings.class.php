@@ -28,8 +28,9 @@ class virtualpageSettingsManagerController extends virtualpageMainController {
 
 		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/route.window.js');
 		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/route.grid.js');
-		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/event.grid.js');
+		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/handler.window.js');
 		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/handler.grid.js');
+		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/event.grid.js');
 		$this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/settings/settings.panel.js');
 
 		$this->addHtml(str_replace('			', '', '

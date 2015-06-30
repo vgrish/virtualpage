@@ -30,9 +30,7 @@ virtualpage.panel.Settings = function(config) {
                 autoHeight: true
             },
             border: true,
-            hideMode: 'offsets'
-
-            ,
+            hideMode: 'offsets',
             items: [{
                 title: _('vp_routes'),
                 items: [{
@@ -63,11 +61,7 @@ virtualpage.panel.Settings = function(config) {
                 }, {
                     xtype: 'virtualpage-grid-event'
                 }]
-            }
-
-
-            ]
-
+            }]
         }]
     });
     virtualpage.panel.Settings.superclass.constructor.call(this, config);
