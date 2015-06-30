@@ -6,7 +6,8 @@
 
 include_once dirname(dirname(__FILE__)) . '/lib/fastroute/src/bootstrap.php';
 
-class virtualpage {
+class virtualpage
+{
 	/* @var modX $modx */
 	public $modx;
 
@@ -28,7 +29,8 @@ class virtualpage {
 	 * @param modX $modx
 	 * @param array $config
 	 */
-	function __construct(modX &$modx, array $config = array()) {
+	function __construct(modX &$modx, array $config = array())
+	{
 		$this->modx =& $modx;
 
 		$this->namespace = $this->getOption('namespace', $config, 'virtualpage');
@@ -51,7 +53,7 @@ class virtualpage {
 			'snippetsPath' => $corePath . 'elements/snippets/',
 			'processorsPath' => $corePath . 'processors/',
 
-			'cache_key' => $this->namespace.'/',
+			'cache_key' => $this->namespace . '/',
 			'fastrouter_cache_key' => 'fastrouter',
 
 		), $config);
@@ -70,7 +72,8 @@ class virtualpage {
 	 * @param null $default
 	 * @return mixed|null
 	 */
-	public function getOption($key, $config = array(), $default = null) {
+	public function getOption($key, $config = array(), $default = null)
+	{
 		$option = $default;
 		if (!empty($key) && is_string($key)) {
 			if ($config != null && array_key_exists($key, $config)) {
@@ -92,11 +95,14 @@ class virtualpage {
 	{
 		$ids = $sp['routes'];
 		$this->event = $sp['eventName'];
-		if(empty($ids)) {
+		if (empty($ids)) {
 			$this->modx->log(1, print_r('[virtualpage]:Error empty routes for event - ' . $this->event, 1));
 			return false;
 		}
-		//
+		// check site status
+		if (!$this->modx->checkSiteStatus()) {
+			return false;
+		}
 		$uri = $this->getUri();
 		$this->routes = $this->generateRouteArray($ids);
 		$dispatcher = $this->getDispatcher();
@@ -107,14 +113,16 @@ class virtualpage {
 				break;*/
 			case FastRoute\Dispatcher::FOUND:
 				$properties = $this->getCache('properties');
-				foreach($ids as $id => $z) {
+				foreach ($ids as $id => $z) {
 					$found = array();
 					$route = $properties[$id]['route'];
 					$property = $properties[$id]['properties'];
-					if(empty($property) || empty($route)) {continue;}
+					if (empty($property) || empty($route)) {
+						continue;
+					}
 					preg_match_all("/{([^}]+)}*/i", $route, $found);
 					$url = str_replace($found[0], array_values($params[2]), $route);
-					if($url == $uri) {
+					if ($url == $uri) {
 						$params[2] = array_merge($params[2], $property);
 						break;
 					}
@@ -132,8 +140,9 @@ class virtualpage {
 	 * @param array $data
 	 * @return null
 	 */
-	public function handle($id, array $data) {
-		if(!$handler = $this->modx->getObject('vpHandler', array('id' => $id, 'active' => 1))) {
+	public function handle($id, array $data)
+	{
+		if (!$handler = $this->modx->getObject('vpHandler', array('id' => $id, 'active' => 1))) {
 			return $this->error();
 		}
 		$_REQUEST += array($this->fastrouterKey => $data);
@@ -170,15 +179,20 @@ class virtualpage {
 	 */
 	public function generateRouteArray($ids)
 	{
-		$key = 'route.'.$this->event;
+		$key = 'route.' . $this->event;
 		$routes = $this->getCache($key);
-		if(!empty($routes)) {return $routes;}
+		if (!empty($routes)) {
+			return $routes;
+		}
 		$match = $properties = array();
 		foreach ($ids as $n => $v) {
-			if(!$route = $this->modx->getObject('vpRoute', array('id' => $n, 'active' => 1))) {continue;}
-			foreach ((array) explode(',', $route->get('metod')) as $method) {
-				if((!empty($match[$route->get('route')]))
-					&& (in_array($method, array_values($match[$route->get('route')])))) {
+			if (!$route = $this->modx->getObject('vpRoute', array('id' => $n, 'active' => 1))) {
+				continue;
+			}
+			foreach ((array)explode(',', $route->get('metod')) as $method) {
+				if ((!empty($match[$route->get('route')]))
+					&& (in_array($method, array_values($match[$route->get('route')])))
+				) {
 					continue;
 				}
 				$routes[] = array(
@@ -203,13 +217,14 @@ class virtualpage {
 	/**
 	 * @return FastRoute\Dispatcher|FastRoute\Dispatcher\GroupCountBased
 	 */
-	public function getDispatcher() {
+	public function getDispatcher()
+	{
 		if (!isset($this->dispatcher[$this->event])) {
 			$key = $this->config['fastrouter_cache_key'];
 			$cache = $this->modx->getOption(xPDO::OPT_CACHE_PATH) . $this->config['cache_key'] . $key;
 			$this->dispatcher[$this->event] = FastRoute\cachedDispatcher(function (FastRoute\RouteCollector $router) {
 				$this->getRoutes($router);
-			}, array('cacheFile' => $cache.'.'.$this->event.'.cache.php'));
+			}, array('cacheFile' => $cache . '.' . $this->event . '.cache.php'));
 		}
 		return $this->dispatcher[$this->event];
 	}
@@ -217,7 +232,8 @@ class virtualpage {
 	/**
 	 * @param FastRoute\RouteCollector $router
 	 */
-	protected function getRoutes(FastRoute\RouteCollector $router) {
+	protected function getRoutes(FastRoute\RouteCollector $router)
+	{
 		$routes = $this->routes;
 		if (!$routes) {
 			throw new InvalidArgumentException('Invalid routes');
@@ -230,16 +246,18 @@ class virtualpage {
 	/**
 	 * @return mixed
 	 */
-	public function getMethod() {
+	public function getMethod()
+	{
 		return $_SERVER['REQUEST_METHOD'];
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getUri() {
+	public function getUri()
+	{
 		$alias = $this->modx->getOption('request_alias', null, 'q');
-		$uri = isset($_REQUEST[$alias]) ? (string) $_REQUEST[$alias] : '';
+		$uri = isset($_REQUEST[$alias]) ? (string)$_REQUEST[$alias] : '';
 		return '/' . ltrim($uri, '/');
 	}
 
@@ -271,8 +289,7 @@ class virtualpage {
 					$this->modx->cacheManager->refresh();
 					return true;
 				}
-			}
-			else {
+			} else {
 				//remove
 				if ($event = $this->modx->getObject('modPluginEvent', array('pluginid' => $id, 'event' => $nameEvent))) {
 					if ($event->remove()) {
@@ -301,7 +318,9 @@ class virtualpage {
 			$tmp = $this->runProcessor('mgr/settings/event/getlist', $data);
 			if ($response = json_decode($tmp->response, 1)) {
 				foreach ($response['results'] as $v) {
-					if(empty($v['routes'])) {continue;}
+					if (empty($v['routes'])) {
+						continue;
+					}
 					$ListEvent[$v['name']] = $v['routes'];
 				}
 			}
@@ -317,7 +336,8 @@ class virtualpage {
 	 *
 	 * @return string
 	 */
-	public function process($object = 'modSnippet', $entry, $data) {
+	public function process($object = 'modSnippet', $entry, $data)
+	{
 		$output = '';
 		$description = $data['description'];
 		$content = $data['content'];
@@ -366,34 +386,37 @@ class virtualpage {
 	 */
 	public function getSnippet(array $data = array())
 	{
-		if(!array_key_exists('entry', $data)
-			|| !array_key_exists('object', $data)) {return '';}
+		if (!array_key_exists('entry', $data)
+			|| !array_key_exists('object', $data)
+		) {
+			return '';
+		}
 		$output = '';
 		$cacheOptions = array(
-			'path' => ($data['object'] =='modSnippet') ? 'snippet' : 'chunk',
+			'path' => ($data['object'] == 'modSnippet') ? 'snippet' : 'chunk',
 			'hash' => 1
 		);
 		$cacheOptions = array_merge($data['request'], $cacheOptions);
 		//
-		if(!empty($data['cache'])) {
+		if (!empty($data['cache'])) {
 			$cachedSnippet = $this->getCache('', $cacheOptions);
-			if($cachedSnippet) {
+			if ($cachedSnippet) {
 				return $cachedSnippet;
 			}
 		}
-		if($snippet = $this->modx->getObject($data['object'], $data['entry'])) {
+		if ($snippet = $this->modx->getObject($data['object'], $data['entry'])) {
 			$snippet->_cacheable = false;
 			$snippet->_processed = false;
 			$properties = $snippet->getProperties();
 			$properties = array_merge($properties, $data);
 			$output = $snippet->process($properties);
 			if (strpos($output, '[[') !== false) {
-				$maxIterations= intval($this->modx->getOption('parser_max_iterations', null, 10));
+				$maxIterations = intval($this->modx->getOption('parser_max_iterations', null, 10));
 				$this->modx->parser->processElementTags('', $output, true, false, '[[', ']]', array(), $maxIterations);
 				$this->modx->parser->processElementTags('', $output, true, true, '[[', ']]', array(), $maxIterations);
 			}
 		}
-		if(!empty($data['cache'])) {
+		if (!empty($data['cache'])) {
 			$lifetime = $this->getOption('cache_resource_expires', null, 0);
 			$this->setCache('', $output, $lifetime, $cacheOptions);
 		}
@@ -412,13 +435,12 @@ class virtualpage {
 		);
 		$cacheOptions = array_merge($data['request'], $cacheOptions);
 		//
-		if(empty($data['cache'])) {
+		if (empty($data['cache'])) {
 			$res = $this->newResource($data);
 			$this->modx->resource = $res;
 			$this->modx->getResponse();
 			$this->modx->response->outputContent();
-		}
-		else {
+		} else {
 			$cachedResource = $this->getCache('', $cacheOptions);
 			if (is_array($cachedResource) && array_key_exists('resource', $cachedResource) && is_array($cachedResource['resource'])) {
 				/** @var modResource $resource */
@@ -436,8 +458,7 @@ class virtualpage {
 				// from cache
 				$this->modx->resource = $resource;
 				$this->modx->request->prepareResponse();
-			}
-			else {
+			} else {
 				// create new
 				$res = $this->newResource($data);
 				$this->modx->resource = $res;
@@ -452,12 +473,12 @@ class virtualpage {
 			$this->modx->parser->processElementTags('', $this->modx->resource->_output, true, false, '[[', ']]', array(), $maxIterations);
 			$this->modx->parser->processElementTags('', $this->modx->resource->_output, true, true, '[[', ']]', array(), $maxIterations);
 			//
-			if(($js = $this->modx->getRegisteredClientStartupScripts()) && (strpos($this->modx->resource->_output, '</head>') !== false)) {
+			if (($js = $this->modx->getRegisteredClientStartupScripts()) && (strpos($this->modx->resource->_output, '</head>') !== false)) {
 				/* change to just before closing </head> */
 				$this->modx->resource->_output = preg_replace("/(<\/head>)/i", $js . "\n\\1", $this->modx->resource->_output, 1);
 			}
 			/* Insert jscripts & html block into template - template must have a </body> tag */
-			if((strpos($this->modx->resource->_output, '</body>') !== false) && ($js = $this->modx->getRegisteredClientScripts())) {
+			if ((strpos($this->modx->resource->_output, '</body>') !== false) && ($js = $this->modx->getRegisteredClientScripts())) {
 				$this->modx->resource->_output = preg_replace("/(<\/body>)/i", $js . "\n\\1", $this->modx->resource->_output, 1);
 			}
 			$totalTime = (microtime(true) - $this->modx->startTime);
@@ -475,33 +496,33 @@ class virtualpage {
 			$this->modx->resource->_output = str_replace("[^s^]", $source, $this->modx->resource->_output);
 			// to cache
 			$obj = $this->modx->resource;
-			$results= array();
-			$results['resourceClass']= $obj->_class;
-			$results['resource']['_processed']= $obj->getProcessed();
-			$results['resource']= $obj->toArray('', true);
-			$results['resource']['_content']= $obj->_content;
+			$results = array();
+			$results['resourceClass'] = $obj->_class;
+			$results['resource']['_processed'] = $obj->getProcessed();
+			$results['resource'] = $obj->toArray('', true);
+			$results['resource']['_content'] = $obj->_content;
 			if ($contentType = $obj->getOne('ContentType')) {
-				$results['contentType']= $contentType->toArray('', true);
+				$results['contentType'] = $contentType->toArray('', true);
 			}
 			if (!empty($this->modx->elementCache)) {
-				$results['elementCache']= $this->modx->elementCache;
+				$results['elementCache'] = $this->modx->elementCache;
 			}
 			if (!empty($this->modx->sourceCache)) {
-				$results['sourceCache']= $this->modx->sourceCache;
+				$results['sourceCache'] = $this->modx->sourceCache;
 			}
 			if (!empty($obj->_sjscripts)) {
-				$results['resource']['_sjscripts']= $obj->_sjscripts;
+				$results['resource']['_sjscripts'] = $obj->_sjscripts;
 			}
 			if (!empty($obj->_jscripts)) {
-				$results['resource']['_jscripts']= $obj->_jscripts;
+				$results['resource']['_jscripts'] = $obj->_jscripts;
 			}
 			if (!empty($obj->_loadedjscripts)) {
-				$results['resource']['_loadedjscripts']= $obj->_loadedjscripts;
+				$results['resource']['_loadedjscripts'] = $obj->_loadedjscripts;
 			}
 		}
 		if (!empty($results)) {
 			$lifetime = $this->getOption('cache_resource_expires', null, 0);
-			$this->setCache('', $results, $lifetime, $cacheOptions); 
+			$this->setCache('', $results, $lifetime, $cacheOptions);
 		}
 		$output = $this->modx->resource->_output;
 		exit($output);
@@ -515,7 +536,7 @@ class virtualpage {
 	{
 		$res = $this->modx->newObject('modResource');
 		$res->fromArray($data);
-		if(!isset($data['id'])) {
+		if (!isset($data['id'])) {
 			$res->set('id', $this->modx->getOption('site_start'));
 		}
 
@@ -530,13 +551,13 @@ class virtualpage {
 	 *
 	 * @return string
 	 */
-	public function setCache($key, $data = array(), $lifetime= 0, $options = array())
+	public function setCache($key, $data = array(), $lifetime = 0, $options = array())
 	{
 		$cacheKey = $this->config['cache_key'];
-		if(array_key_exists('path', $options)){
-			$cacheKey .= $options['path'].'/';
+		if (array_key_exists('path', $options)) {
+			$cacheKey .= $options['path'] . '/';
 		}
-		if(array_key_exists('hash', $options)){
+		if (array_key_exists('hash', $options)) {
 			$key = sha1(serialize($options + array($key)));
 		}
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
@@ -544,7 +565,7 @@ class virtualpage {
 			$this->modx->cacheManager->set(
 				$key,
 				$data,
-				(integer) $lifetime,
+				(integer)$lifetime,
 				$cacheOptions
 			);
 		}
@@ -561,10 +582,10 @@ class virtualpage {
 	public function getCache($key, $options = array())
 	{
 		$cacheKey = $this->config['cache_key'];
-		if(array_key_exists('path', $options)){
-			$cacheKey .= $options['path'].'/';
+		if (array_key_exists('path', $options)) {
+			$cacheKey .= $options['path'] . '/';
 		}
-		if(array_key_exists('hash', $options)){
+		if (array_key_exists('hash', $options)) {
 			$key = sha1(serialize($options + array($key)));
 		}
 		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
@@ -599,7 +620,8 @@ class virtualpage {
 	 *
 	 * @return mixed
 	 */
-	function runProcessor($action = '', $scriptProperties = array()) {
+	function runProcessor($action = '', $scriptProperties = array())
+	{
 		$this->modx->error->errors = $this->modx->error->message = null;
 		return $this->modx->runProcessor($action, $scriptProperties, array(
 				'processors_path' => $this->config['processorsPath']
@@ -610,7 +632,8 @@ class virtualpage {
 	/**
 	 * @return string
 	 */
-	public function error() {
+	public function error()
+	{
 		$this->modx->sendErrorPage(array('vp_die' => true));
 		return '';
 	}
