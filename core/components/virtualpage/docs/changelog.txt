@@ -1,5 +1,9 @@
 Changelog for virtualpage.
 
+1.0.8-beta
+==============
+- add check site status
+
 1.0.7-beta
 ==============
 - update FastRoute

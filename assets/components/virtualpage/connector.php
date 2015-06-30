@@ -1,16 +1,13 @@
 <?php
-// For debug
-ini_set('display_errors', 1);
-ini_set('error_reporting', -1);
-
-// Load MODX config
-if (file_exists(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.core.php')) {
-	require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config.core.php';
+$productionConfig = dirname(dirname(dirname(dirname(__FILE__)))) . '/config.core.php';
+$developmentConfig = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.core.php';
+if (file_exists($productionConfig)) {
+	/** @noinspection PhpIncludeInspection */
+	require_once $productionConfig;
 } else {
-	require_once dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.core.php';
+	/** @noinspection PhpIncludeInspection */
+	require_once $developmentConfig;
 }
-
-//require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config.core.php';
 /** @noinspection PhpIncludeInspection */
 require_once MODX_CORE_PATH . 'config/' . MODX_CONFIG_KEY . '.inc.php';
 /** @noinspection PhpIncludeInspection */
