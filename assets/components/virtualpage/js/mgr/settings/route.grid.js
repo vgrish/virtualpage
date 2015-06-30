@@ -84,19 +84,19 @@ Ext.extend(virtualpage.grid.Route, MODx.grid.Grid, {
                 width: 25,
                 sortable: true
             },
-            metod: {
-                width: 50,
-                sortable: true,
-                editor: {
-                    xtype: 'virtualpage-combo-metod',
-                    allowBlank: false
-                }
-            },
             route: {
                 width: 50,
                 sortable: true,
                 editor: {
                     xtype: 'textfield',
+                    allowBlank: false
+                }
+            },
+            metod: {
+                width: 50,
+                sortable: true,
+                editor: {
+                    xtype: 'virtualpage-combo-metod',
                     allowBlank: false
                 }
             },
@@ -179,50 +179,66 @@ Ext.extend(virtualpage.grid.Route, MODx.grid.Grid, {
     },
 
     createRoute: function(btn, e) {
-        if (!this.windows.createRoute) {
-            this.windows.createRoute = MODx.load({
-                xtype: 'virtualpage-window-route-create',
-                fields: this.getRouteFields('create'),
-                listeners: {
-                    success: {
-                        fn: function() {
-                            this.refresh();
-                        },
-                        scope: this
-                    }
-                }
-            });
-        }
-        this.windows.createRoute.fp.getForm().reset();
-        this.windows.createRoute.fp.getForm().setValues({
+        var record = {
             active: 1,
             metod: 'GET,POST'
+        };
+        var w = Ext.getCmp('virtualpage-window-route-create');
+        if (w) {
+            w.hide().getEl().remove();
+        }
+        w = MODx.load({
+            xtype: 'virtualpage-window-route-update',
+            title: _('vp_menu_create'),
+            action: 'mgr/settings/route/create',
+            record: record,
+            id: 'virtualpage-window-route-create',
+            listeners: {
+                success: {
+                    fn: this.refresh,
+                    scope: this
+                }
+            }
         });
-        this.windows.createRoute.show(e.target);
+        w.fp.getForm().reset();
+        w.fp.getForm().setValues(record);
+        w.show(e.target);
     },
 
-    updateRoute: function(btn, e) {
-        if (!this.menu.record || !this.menu.record.id) return false;
-        var r = this.menu.record;
+    updateRoute: function(btn, e, row) {
+        var record = typeof(row) != 'undefined' ? row.data : this.menu.record;
 
-        if (!this.windows.updateRoute) {
-            this.windows.updateRoute = MODx.load({
-                xtype: 'virtualpage-window-route-update',
-                record: r,
-                fields: this.getRouteFields('update'),
-                listeners: {
-                    success: {
-                        fn: function() {
-                            this.refresh();
-                        },
-                        scope: this
-                    }
+        MODx.Ajax.request({
+            url: virtualpage.config.connector_url,
+            params: {
+                action: 'mgr/settings/route/get',
+                id: record.id
+            },
+            listeners: {
+                success: {
+                    fn: function(r) {
+                        var record = r.object;
+                        if (!!record.properties) {
+                            record.properties = Ext.util.JSON.encode(record.properties);
+                        }
+                        var w = MODx.load({
+                            xtype: 'virtualpage-window-route-update',
+                            record: record,
+                            listeners: {
+                                success: {
+                                    fn: this.refresh,
+                                    scope: this
+                                }
+                            }
+                        });
+                        w.fp.getForm().reset();
+                        w.fp.getForm().setValues(record);
+                        w.show(e.target);
+                    },
+                    scope: this
                 }
-            });
-        }
-        this.windows.updateRoute.fp.getForm().reset();
-        this.windows.updateRoute.fp.getForm().setValues(r);
-        this.windows.updateRoute.show(e.target);
+            }
+        });
     },
 
     removeRoute: function(btn, e) {
@@ -239,132 +255,14 @@ Ext.extend(virtualpage.grid.Route, MODx.grid.Grid, {
             },
             listeners: {
                 success: {
-                    fn: function(r) {
+                    fn: function (r) {
                         this.refresh();
                     },
                     scope: this
                 }
             }
         });
-    },
-
-    /*getRouteFields: function(type) {
-        var fields = [];
-
-        fields.push({
-            xtype: 'hidden',
-            name: 'id',
-            id: 'virtualpage-route-id-' + type
-        }, {
-            xtype: 'virtualpage-combo-metod',
-            fieldLabel: _('vp_metod'),
-            name: 'metod',
-            allowBlank: false,
-            anchor: '99%',
-            id: 'virtualpage-route-metod-' + type
-        }, {
-            xtype: 'textfield',
-            fieldLabel: _('vp_route'),
-            name: 'route',
-            allowBlank: false,
-            anchor: '99%',
-            id: 'virtualpage-route-route-' + type
-        }, {
-            xtype: 'virtualpage-combo-event',
-            fieldLabel: _('vp_event'),
-            name: 'event',
-            allowBlank: false,
-            anchor: '99%',
-            id: 'virtualpage-route-event-' + type
-        }, {
-            xtype: 'virtualpage-combo-handler',
-            fieldLabel: _('vp_handler'),
-            name: 'handler',
-            allowBlank: false,
-            anchor: '99%',
-            id: 'virtualpage-route-handler-' + type
-        }, {
-            xtype: 'textarea',
-            fieldLabel: _('vp_placeholders'),
-            name: 'properties',
-            anchor: '99%',
-            id: 'virtualpage-route-properties-' + type
-        }, {
-            xtype: 'textarea',
-            fieldLabel: _('vp_description'),
-            name: 'description',
-            anchor: '99%',
-            id: 'virtualpage-route-description-' + type
-        });
-
-        fields.push({
-            xtype: 'xcheckbox',
-            fieldLabel: '',
-            boxLabel: _('vp_active'),
-            name: 'active',
-            id: 'virtualpage-route-active-' + type
-        });
-
-        return fields;
-    }*/
+    }
 
 });
 Ext.reg('virtualpage-grid-route', virtualpage.grid.Route);
-
-/*
-
-virtualpage.window.CreateRoute = function(config) {
-    config = config || {};
-    this.ident = config.ident || 'mecitem' + Ext.id();
-    Ext.applyIf(config, {
-        title: _('vp_menu_create'),
-        id: this.ident,
-        width: 600,
-        autoHeight: true,
-        labelAlign: 'left',
-        labelWidth: 180,
-        url: virtualpage.config.connector_url,
-        action: 'mgr/settings/route/create',
-        fields: config.fields,
-        keys: [{
-            key: Ext.EventObject.ENTER,
-            shift: true,
-            fn: function() {
-                this.submit()
-            },
-            scope: this
-        }]
-    });
-    virtualpage.window.CreateRoute.superclass.constructor.call(this, config);
-};
-Ext.extend(virtualpage.window.CreateRoute, MODx.Window);
-Ext.reg('virtualpage-window-route-create', virtualpage.window.CreateRoute);
-
-
-virtualpage.window.UpdateRoute = function(config) {
-    config = config || {};
-    this.ident = config.ident || 'meuitem' + Ext.id();
-    Ext.applyIf(config, {
-        title: _('vp_menu_update'),
-        id: this.ident,
-        width: 600,
-        autoHeight: true,
-        labelAlign: 'left',
-        labelWidth: 180,
-        url: virtualpage.config.connector_url,
-        action: 'mgr/settings/route/update',
-        fields: config.fields,
-        keys: [{
-            key: Ext.EventObject.ENTER,
-            shift: true,
-            fn: function() {
-                this.submit()
-            },
-            scope: this
-        }]
-    });
-    virtualpage.window.UpdateRoute.superclass.constructor.call(this, config);
-};
-Ext.extend(virtualpage.window.UpdateRoute, MODx.Window);
-Ext.reg('virtualpage-window-route-update', virtualpage.window.UpdateRoute);
-*/

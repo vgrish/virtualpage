@@ -2,9 +2,9 @@ virtualpage.window.UpdateRoute = function(config) {
     config = config || {};
 
     Ext.applyIf(config, {
-        title: _('virtualpage_action_edit'),
+        title: _('vp_menu_update'),
         url: virtualpage.config.connector_url,
-        action: 'mgr/sets/update',
+        action: 'mgr/settings/route/update',
         fields: this.getFields(config),
         keys: this.getKeys(config),
         width: 600,
@@ -34,7 +34,7 @@ Ext.extend(virtualpage.window.UpdateRoute, MODx.Window, {
             xtype: 'textfield',
             fieldLabel: _('vp_route'),
             name: 'route',
-            anchor: '99%',
+            anchor: '99.5%',
             allowBlank: false
         }, {
             items: [{
@@ -44,12 +44,12 @@ Ext.extend(virtualpage.window.UpdateRoute, MODx.Window, {
                     layout: 'column',
                     border: false,
                     items: [{
-                        columnWidth: .5,
+                        columnWidth: .49,
                         border: false,
                         layout: 'form',
                         items: this.getLeftFields(config)
                     }, {
-                        columnWidth: .5,
+                        columnWidth: .51,
                         border: false,
                         layout: 'form',
                         cls: 'right-column',
@@ -59,59 +59,49 @@ Ext.extend(virtualpage.window.UpdateRoute, MODx.Window, {
             }]
         }, {
             xtype: 'textarea',
+            fieldLabel: _('vp_placeholders'),
+            name: 'properties',
+            anchor: '99.5%'
+        }, {
+            xtype: 'textarea',
             fieldLabel: _('vp_description'),
             name: 'description',
-            anchor: '99%'
+            anchor: '99.5%'
         }];
     },
 
     getLeftFields: function(config) {
         return [{
-            xtype: 'virtualpage-combo-file-type',
-            fieldLabel: _('type'),
-            name: 'name',
-            anchor: '99%'
+            xtype: 'virtualpage-combo-metod',
+            fieldLabel: _('vp_metod'),
+            name: 'metod',
+            anchor: '99%',
+            allowBlank: false
         }, {
-            xtype: 'virtualpage-combo-file-format',
-            fieldLabel: _('virtualpage_format'),
-            name: 'parent',
-            anchor: '99%'
-        }, {
-            xtype: 'virtualpage-combo-file-orientation',
-            fieldLabel: _('virtualpage_orientation'),
-            name: 'orientation',
-            anchor: '99%'
+            xtype: 'virtualpage-combo-event',
+            fieldLabel: _('vp_event'),
+            name: 'event',
+            anchor: '99%',
+            allowBlank: false
         }];
     },
 
     getRightFields: function(config) {
-        return [{
-            xtype: 'virtualpage-combo-chunk',
-            fieldLabel: _('virtualpage_row'),
-            name: 'row',
+        return [ {
+            xtype: 'virtualpage-combo-handler',
+            fieldLabel: _('vp_handler'),
+            name: 'handler',
             anchor: '99%',
-            hiddenName: 'row'
-        }, {
-            xtype: 'virtualpage-combo-chunk',
-            fieldLabel: _('virtualpage_wrapper'),
-            name: 'wrapper',
-            anchor: '99%',
-            hiddenName: 'wrapper'
-        }, {
+            allowBlank: false
+        },{
             xtype: 'checkboxgroup',
             columns: 2,
             items: [{
                 xtype: 'xcheckbox',
                 fieldLabel: '',
-                boxLabel: _('virtualpage_updatable'),
-                name: 'updatable',
-                checked: config.record.updatable
-            }, {
-                xtype: 'xcheckbox',
-                fieldLabel: '',
-                boxLabel: _('virtualpage_undeletable'),
-                name: 'undeletable',
-                checked: config.record.undeletable
+                boxLabel: _('vp_active'),
+                name: 'active',
+                checked: config.record.active
             }]
         }];
     }
