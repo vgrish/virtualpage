@@ -51,57 +51,80 @@ virtualpage.grid.Event = function(config) {
         baseParams: {
             action: 'mgr/settings/event/getlist'
         },
-        fields: ['id', 'name', 'description', 'active'],
-        autoHeight: true,
+        fields: this.getFields(config),
+        columns: this.getColumns(config),
+        tbar: this.getTopBar(config),
+        listeners: this.getListeners(config),
         paging: true,
         remoteSort: true,
+        autoHeight: true,
         save_action: 'mgr/settings/event/updatefromgrid',
         autosave: true,
         plugins: this.exp,
-        columns: [this.exp, {
-            header: _('vp_id'),
-            dataIndex: 'id',
-            width: 50,
-            sortable: true
-        }, {
-            header: _('vp_name'),
-            dataIndex: 'name',
-            width: 150,
-            editor: {
-                xtype: 'virtualpage-combo-plugin-event',
-                allowBlank: false
-            },
-            sortable: true
-        }, {
-            header: _('vp_active'),
-            dataIndex: 'active',
-            sortable: true,
-            width: 50,
-            editor: {
-                xtype: 'combo-boolean',
-                renderer: 'boolean'
-            }
-        }],
-        tbar: [{
-            text: _('vp_btn_create'),
-            handler: this.createEvent,
-            scope: this
-        }],
         ddGroup: 'dd',
-        enableDragDrop: true,
-        listeners: {
-            render: {
-                fn: this.dd,
-                scope: this
-            }
-        }
+        enableDragDrop: true
     });
     virtualpage.grid.Event.superclass.constructor.call(this, config);
 };
 Ext.extend(virtualpage.grid.Event, MODx.grid.Grid, {
-    windows: {}
+    windows: {},
 
-    ,
+    getFields: function(config) {
+        var fields = ['id', 'name', 'description', 'active'];
+
+        return fields;
+    },
+
+    getColumns: function(config) {
+        var columns = [this.exp];
+        var add = {
+            id: {
+                width: 25,
+                sortable: true
+            },
+            name: {
+                width: 50,
+                sortable: true,
+                editor: {
+                    xtype: 'virtualpage-combo-plugin-event',
+                    allowBlank: false
+                }
+            },
+            active: {
+                width: 35,
+                sortable: false,
+                editor: {
+                    xtype: 'combo-boolean',
+                    renderer: 'boolean'
+                }
+            }
+        };
+
+        for (var field in add) {
+            if (add[field]) {
+                Ext.applyIf(add[field], {
+                    header: _('vp_' + field),
+                    tooltip: _('vp_tooltip_' + field),
+                    dataIndex: field
+                });
+                columns.push(add[field]);
+            }
+        }
+
+        return columns;
+    },
+
+    getTopBar: function(config) {
+        var tbar = [];
+        tbar.push({
+            text: _('vp_btn_create'),
+            handler: this.createEvent,
+            scope: this
+        });
+
+        return tbar;
+    },
+
     getMenu: function() {
         var m = [];
         m.push({
@@ -114,57 +137,77 @@ Ext.extend(virtualpage.grid.Event, MODx.grid.Grid, {
             handler: this.removeEvent
         });
         this.addContextMenuItem(m);
-    }
+    },
 
-    ,
+    getListeners: function(config) {
+        var listeners = {};
+        listeners.render = {fn: this.dd, scope: this};
+
+        return listeners;
+    },
+
     createEvent: function(btn, e) {
-        if (!this.windows.createEvent) {
-            this.windows.createEvent = MODx.load({
-                xtype: 'virtualpage-window-event-create',
-                fields: this.getEventFields('create'),
-                listeners: {
-                    success: {
-                        fn: function() {
-                            this.refresh();
-                        },
-                        scope: this
-                    }
-                }
-            });
-        }
-        this.windows.createEvent.fp.getForm().reset();
-        this.windows.createEvent.fp.getForm().setValues({
+        var record = {
             active: 1
-        });
-        this.windows.createEvent.show(e.target);
-    }
-
-    ,
-    updateEvent: function(btn, e) {
-        if (!this.menu.record || !this.menu.record.id) return false;
-        var r = this.menu.record;
-
-        if (!this.windows.updateEvent) {
-            this.windows.updateEvent = MODx.load({
-                xtype: 'virtualpage-window-event-update',
-                record: r,
-                fields: this.getEventFields('update'),
-                listeners: {
-                    success: {
-                        fn: function() {
-                            this.refresh();
-                        },
-                        scope: this
-                    }
-                }
-            });
+        };
+        var w = Ext.getCmp('virtualpage-window-event-create');
+        if (w) {
+            w.hide().getEl().remove();
         }
-        this.windows.updateEvent.fp.getForm().reset();
-        this.windows.updateEvent.fp.getForm().setValues(r);
-        this.windows.updateEvent.show(e.target);
-    }
+        w = MODx.load({
+            xtype: 'virtualpage-window-event-update',
+            title: _('vp_menu_create'),
+            action: 'mgr/settings/event/create',
+            record: record,
+            id: 'virtualpage-window-event-create',
+            listeners: {
+                success: {
+                    fn: this.refresh,
+                    scope: this
+                }
+            }
+        });
+        w.fp.getForm().reset();
+        w.fp.getForm().setValues(record);
+        w.show(e.target);
+    },
 
-    ,
+    updateEvent: function(btn, e, row) {
+        var record = typeof(row) != 'undefined' ? row.data : this.menu.record;
+
+        MODx.Ajax.request({
+            url: virtualpage.config.connector_url,
+            params: {
+                action: 'mgr/settings/event/get',
+                id: record.id
+            },
+            listeners: {
+                success: {
+                    fn: function(r) {
+                        var record = r.object;
+                        if (!!record.properties) {
+                            record.properties = Ext.util.JSON.encode(record.properties);
+                        }
+                        var w = MODx.load({
+                            xtype: 'virtualpage-window-event-update',
+                            record: record,
+                            listeners: {
+                                success: {
+                                    fn: this.refresh,
+                                    scope: this
+                                }
+                            }
+                        });
+                        w.fp.getForm().reset();
+                        w.fp.getForm().setValues(record);
+                        w.show(e.target);
+                    },
+                    scope: this
+                }
+            }
+        });
+    },
+
     removeEvent: function(btn, e) {
         if (!this.menu.record) return false;
 
@@ -187,95 +230,5 @@ Ext.extend(virtualpage.grid.Event, MODx.grid.Grid, {
         });
     }
 
-    ,
-    getEventFields: function(type) {
-        var fields = [];
-
-        fields.push({
-            xtype: 'hidden',
-            name: 'id',
-            id: 'virtualpage-event-id-' + type
-        }, {
-            xtype: 'virtualpage-combo-plugin-event',
-            fieldLabel: _('vp_name'),
-            name: 'name',
-            allowBlank: false,
-            anchor: '99%',
-            id: 'virtualpage-event-name-' + type
-        }, {
-            xtype: 'textarea',
-            fieldLabel: _('vp_description'),
-            name: 'description',
-            anchor: '99%',
-            id: 'virtualpage-event-description-' + type
-        });
-
-        fields.push({
-            xtype: 'xcheckbox',
-            fieldLabel: '',
-            boxLabel: _('vp_active'),
-            name: 'active',
-            id: 'virtualpage-event-active-' + type
-        });
-
-        return fields;
-    }
-
 });
 Ext.reg('virtualpage-grid-event', virtualpage.grid.Event);
-
-
-virtualpage.window.CreateEvent = function(config) {
-    config = config || {};
-    this.ident = config.ident || 'mecitem' + Ext.id();
-    Ext.applyIf(config, {
-        title: _('vp_menu_create'),
-        id: this.ident,
-        width: 600,
-        autoHeight: true,
-        labelAlign: 'left',
-        labelWidth: 180,
-        url: virtualpage.config.connector_url,
-        action: 'mgr/settings/event/create',
-        fields: config.fields,
-        keys: [{
-            key: Ext.EventObject.ENTER,
-            shift: true,
-            fn: function() {
-                this.submit()
-            },
-            scope: this
-        }]
-    });
-    virtualpage.window.CreateEvent.superclass.constructor.call(this, config);
-};
-Ext.extend(virtualpage.window.CreateEvent, MODx.Window);
-Ext.reg('virtualpage-window-event-create', virtualpage.window.CreateEvent);
-
-
-virtualpage.window.UpdateEvent = function(config) {
-    config = config || {};
-    this.ident = config.ident || 'meuitem' + Ext.id();
-    Ext.applyIf(config, {
-        title: _('vp_menu_update'),
-        id: this.ident,
-        width: 600,
-        autoHeight: true,
-        labelAlign: 'left',
-        labelWidth: 180,
-        url: virtualpage.config.connector_url,
-        action: 'mgr/settings/event/update',
-        fields: config.fields,
-        keys: [{
-            key: Ext.EventObject.ENTER,
-            shift: true,
-            fn: function() {
-                this.submit()
-            },
-            scope: this
-        }]
-    });
-    virtualpage.window.UpdateEvent.superclass.constructor.call(this, config);
-};
-Ext.extend(virtualpage.window.UpdateEvent, MODx.Window);
-Ext.reg('virtualpage-window-event-update', virtualpage.window.UpdateEvent);
