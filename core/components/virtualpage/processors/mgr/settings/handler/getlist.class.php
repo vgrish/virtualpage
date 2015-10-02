@@ -1,18 +1,24 @@
 <?php
-class vpHandlerGetListProcessor extends modObjectGetListProcessor {
+
+class vpHandlerGetListProcessor extends modObjectGetListProcessor
+{
 	public $classKey = 'vpHandler';
 	public $defaultSortField = 'rank';
-	public $defaultSortDirection  = 'asc';
+	public $defaultSortDirection = 'asc';
 	public $permission = '';
+
 	/** {@inheritDoc} */
-	public function initialize() {
+	public function initialize()
+	{
 		if (!$this->modx->hasPermission($this->permission)) {
 			return $this->modx->lexicon('access_denied');
 		}
 		return parent::initialize();
 	}
+
 	/** {@inheritDoc} */
-	public function prepareQueryBeforeCount(xPDOQuery $c) {
+	public function prepareQueryBeforeCount(xPDOQuery $c)
+	{
 		if ($active = $this->getProperty('active')) {
 			$c->where(array('active' => $active));
 		}
@@ -22,11 +28,13 @@ class vpHandlerGetListProcessor extends modObjectGetListProcessor {
 		}
 		return $c;
 	}
+
 	/** {@inheritDoc} */
-	public function prepareRow(xPDOObject $object) {
+	public function prepareRow(xPDOObject $object)
+	{
 		$array = $object->toArray();
 
-		switch($array['type']) {
+		switch ($array['type']) {
 			case 0: {
 				$n = 'vp_type_resource';
 				break;
@@ -50,4 +58,5 @@ class vpHandlerGetListProcessor extends modObjectGetListProcessor {
 		return $array;
 	}
 }
+
 return 'vpHandlerGetListProcessor';

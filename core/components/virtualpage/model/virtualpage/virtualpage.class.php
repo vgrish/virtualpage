@@ -21,9 +21,7 @@ class virtualpage
 	public $event;
 	public $routes;
 	public $dispatcher;
-
 	public $fastrouterKey;
-
 
 	/**
 	 * @param modX $modx
@@ -52,10 +50,6 @@ class virtualpage
 			'chunkSuffix' => '.chunk.tpl',
 			'snippetsPath' => $corePath . 'elements/snippets/',
 			'processorsPath' => $corePath . 'processors/',
-
-			'cache_key' => $this->namespace . '/',
-			'fastrouter_cache_key' => 'fastrouter',
-
 		), $config);
 
 		$this->modx->addPackage('virtualpage', $this->config['modelPath']);
@@ -63,7 +57,6 @@ class virtualpage
 
 		$this->active = $this->modx->getOption('virtualpage_active', $config, false);
 		$this->fastrouterKey = $this->modx->getOption('virtualpage_fastrouter_key', null, 'fastrouter');
-
 	}
 
 	/**
@@ -80,7 +73,7 @@ class virtualpage
 				$option = $config[$key];
 			} elseif (array_key_exists($key, $this->config)) {
 				$option = $this->config[$key];
-			} elseif (array_key_exists("{$this->namespace}.{$key}", $this->modx->config)) {
+			} elseif (array_key_exists("{$this->namespace}_{$key}", $this->modx->config)) {
 				$option = $this->modx->getOption("{$this->namespace}.{$key}");
 			}
 		}
@@ -93,14 +86,14 @@ class virtualpage
 	 */
 	public function doRoutes($sp = array())
 	{
+		/* check site status */
+		if (!$this->modx->checkSiteStatus()) {
+			return false;
+		}
 		$ids = $sp['routes'];
 		$this->event = $sp['eventName'];
 		if (empty($ids)) {
 			$this->modx->log(1, print_r('[virtualpage]:Error empty routes for event - ' . $this->event, 1));
-			return false;
-		}
-		// check site status
-		if (!$this->modx->checkSiteStatus()) {
 			return false;
 		}
 		$uri = $this->getUri();
@@ -112,7 +105,9 @@ class virtualpage
 				return $this->error();
 				break;*/
 			case FastRoute\Dispatcher::FOUND:
-				$properties = $this->getCache('properties');
+				$opts = array();
+				$opts['cache_key'] = 'event/properties/' . $this->event;
+				$properties = $this->getCache($opts);
 				foreach ($ids as $id => $z) {
 					$found = array();
 					$route = $properties[$id]['route'];
@@ -131,7 +126,6 @@ class virtualpage
 				return $this->handle($params[1], $params[2]);
 				break;
 		}
-
 		return true;
 	}
 
@@ -153,6 +147,7 @@ class virtualpage
 		$data['cache'] = $handler->get('cache');
 		$data['request'] = $_REQUEST;
 		$output = '';
+
 		switch ($type) {
 			case 0:
 				$output = $this->process('sendForward', $entry, $data);
@@ -179,9 +174,9 @@ class virtualpage
 	 */
 	public function generateRouteArray($ids)
 	{
-		$key = 'route.' . $this->event;
-		$routes = $this->getCache($key);
-		if (!empty($routes)) {
+		$opts = array();
+		$opts['cache_key'] = 'event/route/' . $this->event;
+		if ($routes = $this->getCache($opts)) {
 			return $routes;
 		}
 		$match = $properties = array();
@@ -207,10 +202,9 @@ class virtualpage
 				$match[$route->get('route')][] = $method;
 			}
 		}
-		$this->setCache($key, $routes);
-		$key = 'properties';
-		$this->setCache($key, $properties);
-
+		$this->setCache($routes, $opts);
+		$opts['cache_key'] = 'event/properties/' . $this->event;
+		$this->setCache($properties, $opts);
 		return $routes;
 	}
 
@@ -219,12 +213,16 @@ class virtualpage
 	 */
 	public function getDispatcher()
 	{
+		$cacheKey = $this->modx->getOption(xPDO::OPT_CACHE_PATH) . 'default/';
+		if (isset($this->config['fastrouter_cache_key'])) {
+			$cacheKey .= $this->config['fastrouter_cache_key'];
+		} else {
+			$cacheKey .= $this->modx->getOption('virtualpage_fastrouter_cache_key', null, 'virtualpage/event/');
+		}
 		if (!isset($this->dispatcher[$this->event])) {
-			$key = $this->config['fastrouter_cache_key'];
-			$cache = $this->modx->getOption(xPDO::OPT_CACHE_PATH) . $this->config['cache_key'] . $key;
 			$this->dispatcher[$this->event] = FastRoute\cachedDispatcher(function (FastRoute\RouteCollector $router) {
 				$this->getRoutes($router);
-			}, array('cacheFile' => $cache . '.' . $this->event . '.cache.php'));
+			}, array('cacheFile' => $cacheKey . '/' . $this->event . '.cache.php'));
 		}
 		return $this->dispatcher[$this->event];
 	}
@@ -272,12 +270,12 @@ class virtualpage
 	 */
 	public function doEvent($action = 'create', $nameEvent = '', $namePlugin = 'vpEvent', $priority = 0)
 	{
-		if (empty($nameEvent)) return false;
+		if (empty($nameEvent)) {
+			return false;
+		}
 		if ($plugin = $this->modx->getObject('modPlugin', array('name' => $namePlugin))) {
+			$this->clearCache(array('cache_key' => 'event/'));
 			$id = $plugin->get('id');
-			// clear cache
-			$this->clearCache();
-			// create || update
 			if (($action == 'create') || ($action == 'update')) {
 				if (!$event = $this->modx->getObject('modPluginEvent', array('pluginid' => $id, 'event' => $nameEvent))) {
 					$event = $this->modx->newObject('modPluginEvent');
@@ -286,14 +284,14 @@ class virtualpage
 				$event->set('event', $nameEvent);
 				$event->set('priority', $priority);
 				if ($event->save()) {
-					$this->modx->cacheManager->refresh();
+					//$this->modx->cacheManager->refresh();
 					return true;
 				}
 			} else {
 				//remove
 				if ($event = $this->modx->getObject('modPluginEvent', array('pluginid' => $id, 'event' => $nameEvent))) {
 					if ($event->remove()) {
-						$this->modx->cacheManager->refresh();
+						//$this->modx->cacheManager->refresh();
 						return true;
 					}
 				}
@@ -311,9 +309,10 @@ class virtualpage
 	 */
 	public function getEvents()
 	{
-		$key = 'event';
-		$ListEvent = $this->getCache($key);
-		if (empty($ListEvent) && $this->modx->getCount('vpEvent') > 0) {
+		$opts = array();
+		$opts['cache_key'] = 'event/all';
+		$listEvent = $this->getCache($opts);
+		if (empty($listEvent) && $this->modx->getCount('vpEvent') > 0) {
 			$data['active'] = 1;
 			$tmp = $this->runProcessor('mgr/settings/event/getlist', $data);
 			if ($response = json_decode($tmp->response, 1)) {
@@ -321,13 +320,12 @@ class virtualpage
 					if (empty($v['routes'])) {
 						continue;
 					}
-					$ListEvent[$v['name']] = $v['routes'];
+					$listEvent[$v['name']] = $v['routes'];
 				}
 			}
-			$this->setCache($key, $ListEvent);
+			$this->setCache($listEvent, $opts);
 		}
-
-		return $ListEvent;
+		return $listEvent;
 	}
 
 	/**
@@ -343,9 +341,12 @@ class virtualpage
 		$content = $data['content'];
 		$cache = $data['cache'];
 		$request = $data['request'];
-		unset($data['content'], $data['request']);
+		unset(
+			$data['content'],
+			$data['request']
+		);
 		$this->modx->setPlaceholders($data, $this->modx->getOption('virtualpage_prefix_placeholder', null, 'vp.'));
-		//
+
 		switch ($object) {
 			case 'sendForward': {
 				$this->modx->sendForward($entry);
@@ -375,7 +376,6 @@ class virtualpage
 			default:
 				break;
 		}
-
 		return $output;
 	}
 
@@ -386,23 +386,15 @@ class virtualpage
 	 */
 	public function getSnippet(array $data = array())
 	{
-		if (!array_key_exists('entry', $data)
-			|| !array_key_exists('object', $data)
-		) {
+		if (!isset($data['entry']) OR !isset($data['object'])) {
 			return '';
 		}
 		$output = '';
-		$cacheOptions = array(
-			'path' => ($data['object'] == 'modSnippet') ? 'snippet' : 'chunk',
-			'hash' => 1
-		);
-		$cacheOptions = array_merge($data['request'], $cacheOptions);
-		//
-		if (!empty($data['cache'])) {
-			$cachedSnippet = $this->getCache('', $cacheOptions);
-			if ($cachedSnippet) {
-				return $cachedSnippet;
-			}
+		$opts = array();
+		$opts['cache_key'] = ($data['object'] == 'modSnippet') ? 'snippet' : 'chunk';
+		$opts['cache_key'] = implode('/', array($opts['cache_key'], sha1(serialize($opts + $data))));
+		if (!empty($data['cache']) AND $cachedSnippet = $this->getCache($opts)) {
+			return $cachedSnippet;
 		}
 		if ($snippet = $this->modx->getObject($data['object'], $data['entry'])) {
 			$snippet->_cacheable = false;
@@ -415,12 +407,15 @@ class virtualpage
 				$this->modx->parser->processElementTags('', $output, true, false, '[[', ']]', array(), $maxIterations);
 				$this->modx->parser->processElementTags('', $output, true, true, '[[', ']]', array(), $maxIterations);
 			}
+			$output = str_replace("[^q^]", '', $output);
+			$output = str_replace("[^qt^]", '', $output);
+			$output = str_replace("[^p^]", '', $output);
+			$output = str_replace("[^t^]", '', $output);
+			$output = str_replace("[^s^]", '', $output);
 		}
 		if (!empty($data['cache'])) {
-			$lifetime = $this->getOption('cache_resource_expires', null, 0);
-			$this->setCache('', $output, $lifetime, $cacheOptions);
+			$this->setCache($output, $opts);
 		}
-
 		return $output;
 	}
 
@@ -429,19 +424,17 @@ class virtualpage
 	 */
 	public function getResource(array $data = array())
 	{
-		$cacheOptions = array(
-			'path' => 'resource',
-			'hash' => 1
-		);
-		$cacheOptions = array_merge($data['request'], $cacheOptions);
-		//
+		$opts = array();
+		$opts['cache_key'] = 'resource';
+		$opts['cache_key'] = implode('/', array($opts['cache_key'], sha1(serialize($opts + $data))));
+
 		if (empty($data['cache'])) {
 			$res = $this->newResource($data);
 			$this->modx->resource = $res;
 			$this->modx->getResponse();
 			$this->modx->response->outputContent();
 		} else {
-			$cachedResource = $this->getCache('', $cacheOptions);
+			$cachedResource = $this->getCache($opts);
 			if (is_array($cachedResource) && array_key_exists('resource', $cachedResource) && is_array($cachedResource['resource'])) {
 				/** @var modResource $resource */
 				$resource = $this->modx->newObject($cachedResource['resourceClass']);
@@ -521,8 +514,7 @@ class virtualpage
 			}
 		}
 		if (!empty($results)) {
-			$lifetime = $this->getOption('cache_resource_expires', null, 0);
-			$this->setCache('', $results, $lifetime, $cacheOptions);
+			$this->setCache($results, $opts);
 		}
 		$output = $this->modx->resource->_output;
 		exit($output);
@@ -534,82 +526,115 @@ class virtualpage
 	 */
 	public function newResource(array $data = array())
 	{
-		$res = $this->modx->newObject('modResource');
-		$res->fromArray($data);
+		$resource = $this->modx->newObject('modResource');
+		$resource->fromArray($data);
 		if (!isset($data['id'])) {
-			$res->set('id', $this->modx->getOption('site_start'));
+			$resource->set('id', $this->modx->getOption('site_start'));
 		}
-
-		return $res;
+		$this->modx->invokeEvent('vpOnResourceAfterCreate', array(
+			'mode' => modSystemEvent::MODE_NEW,
+			'resource' => &$resource,
+		));
+		return $resource;
 	}
 
 	/**
-	 * @param $key
-	 * @param array $data
-	 * @param int $lifetime
-	 * @param array $options
+	 * Sets data to cache
 	 *
-	 * @return string
+	 * @param mixed $data
+	 * @param mixed $options
+	 *
+	 * @return string $cacheKey
 	 */
-	public function setCache($key, $data = array(), $lifetime = 0, $options = array())
+	public function setCache($data = array(), $options = array())
 	{
-		$cacheKey = $this->config['cache_key'];
-		if (array_key_exists('path', $options)) {
-			$cacheKey .= $options['path'] . '/';
-		}
-		if (array_key_exists('hash', $options)) {
-			$key = sha1(serialize($options + array($key)));
-		}
-		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
-		if (!empty($key) && !empty($cacheOptions) && $this->modx->getCacheManager()) {
+		$cacheKey = $this->getCacheKey($options);
+		$cacheOptions = $this->getCacheOptions($options);
+		if (!empty($cacheKey) && !empty($cacheOptions) && $this->modx->getCacheManager()) {
 			$this->modx->cacheManager->set(
-				$key,
+				$cacheKey,
 				$data,
-				(integer)$lifetime,
+				$cacheOptions[xPDO::OPT_CACHE_EXPIRES],
 				$cacheOptions
 			);
 		}
-
-		return $key;
+		return $cacheKey;
 	}
 
 	/**
-	 * @param $key
-	 * @param array $options
+	 * Returns data from cache
 	 *
-	 * @return mixed|string
+	 * @param mixed $options
+	 *
+	 * @return mixed
 	 */
-	public function getCache($key, $options = array())
+	public function getCache($options = array())
 	{
-		$cacheKey = $this->config['cache_key'];
-		if (array_key_exists('path', $options)) {
-			$cacheKey .= $options['path'] . '/';
-		}
-		if (array_key_exists('hash', $options)) {
-			$key = sha1(serialize($options + array($key)));
-		}
-		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
+		$cacheKey = $this->getCacheKey($options);
+		$cacheOptions = $this->getCacheOptions($options);
 		$cached = '';
-		if (!empty($key) && !empty($cacheOptions) && $this->modx->getCacheManager()) {
-			$cached = $this->modx->cacheManager->get($key, $cacheOptions);
+		if (!empty($cacheOptions) && !empty($cacheKey) && $this->modx->getCacheManager()) {
+			$cached = $this->modx->cacheManager->get($cacheKey, $cacheOptions);
 		}
-
 		return $cached;
 	}
 
-	/**
-	 * @param $key
-	 * @return mixed
-	 */
-	public function clearCache()
+	public function clearCache($options = array())
 	{
-		$cacheKey = $this->config['cache_key'];
-		$cacheOptions = array(xPDO::OPT_CACHE_KEY => $cacheKey);
+		$cacheKey = $this->getCacheKey($options);
+		$cacheOptions = $this->getCacheOptions($options);
+		$cacheOptions['cache_key'] .= $cacheKey;
 		if (!empty($cacheOptions) && $this->modx->getCacheManager()) {
-			$this->modx->cacheManager->clean($cacheOptions);
+			return $this->modx->cacheManager->clean($cacheOptions);
 		}
+		return false;
+	}
 
-		return true;
+	/**
+	 * Returns array with options for cache
+	 *
+	 * @param $options
+	 *
+	 * @return array
+	 */
+	protected function getCacheOptions($options = array())
+	{
+		if (empty($options)) {
+			$options = $this->config;
+		}
+		$cacheOptions = array(
+			xPDO::OPT_CACHE_KEY => empty($options['cache_key'])
+				? 'default'
+				: 'default/' . $this->namespace . '/',
+			xPDO::OPT_CACHE_HANDLER => !empty($options['cache_handler'])
+				? $options['cache_handler']
+				: $this->modx->getOption('cache_resource_handler', null, 'xPDOFileCache'),
+			xPDO::OPT_CACHE_EXPIRES => $options['cacheTime'] !== ''
+				? (integer)$options['cacheTime']
+				: (integer)$this->modx->getOption('cache_resource_expires', null, 0),
+		);
+		return $cacheOptions;
+	}
+
+	/**
+	 * Returns key for cache of specified options
+	 *
+	 * @var mixed $options
+	 *
+	 * @return bool|string
+	 */
+	protected function getCacheKey($options = array())
+	{
+		if (empty($options)) {
+			$options = $this->config;
+		}
+		if (!empty($options['cache_key'])) {
+			return $options['cache_key'];
+		}
+		$key = !empty($this->modx->resource)
+			? $this->modx->resource->getCacheKey()
+			: '';
+		return $key . '/' . sha1(serialize($options));
 	}
 
 	/**
@@ -653,7 +678,7 @@ class virtualpage
 	public function OnBeforeCacheUpdate($sp)
 	{
 		// clear cache
-		$this->clearCache();
+		//$this->clearCache();
 	}
 
 }

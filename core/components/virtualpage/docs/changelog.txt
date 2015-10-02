@@ -1,5 +1,10 @@
 Changelog for virtualpage.
 
+1.0.9-beta
+==============
+- added new event: "vpOnResourceAfterCreate"
+- refactoring cache method
+
 1.0.8-beta
 ==============
 - add check site status

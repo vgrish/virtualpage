@@ -1,14 +1,19 @@
 <?php
-require_once (dirname(__FILE__).'/update.class.php');
-class vpRouteFromGridProcessor extends vpRouteUpdateProcessor {
+require_once(dirname(__FILE__) . '/update.class.php');
+
+class vpRouteFromGridProcessor extends vpRouteUpdateProcessor
+{
 	/** {@inheritDoc} */
-	public static function getInstance(modX &$modx,$className,$properties = array()) {
+	public static function getInstance(modX &$modx, $className, $properties = array())
+	{
 		/** @var modProcessor $processor */
-		$processor = new vpRouteFromGridProcessor($modx,$properties);
+		$processor = new vpRouteFromGridProcessor($modx, $properties);
 		return $processor;
 	}
+
 	/** {@inheritDoc} */
-	public function initialize() {
+	public function initialize()
+	{
 		$data = $this->getProperty('data');
 		if (empty($data)) {
 			return $this->modx->lexicon('invalid_data');
@@ -22,4 +27,5 @@ class vpRouteFromGridProcessor extends vpRouteUpdateProcessor {
 		return parent::initialize();
 	}
 }
+
 return 'vpRouteFromGridProcessor';

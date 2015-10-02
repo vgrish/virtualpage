@@ -1,14 +1,19 @@
 <?php
-require_once (dirname(__FILE__).'/update.class.php');
-class vpHandlerFromGridProcessor extends vpHandlerUpdateProcessor {
+require_once(dirname(__FILE__) . '/update.class.php');
+
+class vpHandlerFromGridProcessor extends vpHandlerUpdateProcessor
+{
 	/** {@inheritDoc} */
-	public static function getInstance(modX &$modx,$className,$properties = array()) {
+	public static function getInstance(modX &$modx, $className, $properties = array())
+	{
 		/** @var modProcessor $processor */
-		$processor = new vpHandlerFromGridProcessor($modx,$properties);
+		$processor = new vpHandlerFromGridProcessor($modx, $properties);
 		return $processor;
 	}
+
 	/** {@inheritDoc} */
-	public function initialize() {
+	public function initialize()
+	{
 		$data = $this->getProperty('data');
 		if (empty($data)) {
 			return $this->modx->lexicon('invalid_data');
@@ -22,4 +27,5 @@ class vpHandlerFromGridProcessor extends vpHandlerUpdateProcessor {
 		return parent::initialize();
 	}
 }
+
 return 'vpHandlerFromGridProcessor';

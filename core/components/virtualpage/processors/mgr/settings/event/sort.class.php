@@ -1,17 +1,23 @@
 <?php
+
 // It is adapted code from https://github.com/splittingred/Gallery/blob/a51442648fde1066cf04d46550a04265b1ad67da/core/components/gallery/processors/mgr/item/sort.php
-class vpEventSortProcessor extends modObjectProcessor {
+class vpEventSortProcessor extends modObjectProcessor
+{
 	public $classKey = 'vpEvent';
 	public $permission = 'vpsetting_save';
+
 	/** {@inheritDoc} */
-	public function initialize() {
+	public function initialize()
+	{
 		if (!$this->modx->hasPermission($this->permission)) {
 			return $this->modx->lexicon('access_denied');
 		}
 		return parent::initialize();
 	}
+
 	/** {@inheritDoc} */
-	public function process() {
+	public function process()
+	{
 		/* @var msDelivery $source */
 		$source = $this->modx->getObject($this->classKey, $this->getProperty('source'));
 		/* @var msDelivery $target */
@@ -34,15 +40,17 @@ class vpEventSortProcessor extends modObjectProcessor {
 			");
 		}
 		$newRank = $target->get('rank');
-		$source->set('rank',$newRank);
+		$source->set('rank', $newRank);
 		$source->save();
 		if (!$this->modx->getCount($this->classKey, array('rank' => 0))) {
 			$this->setRanks();
 		}
 		return $this->modx->error->success();
 	}
+
 	/** {@inheritDoc} */
-	public function setRanks() {
+	public function setRanks()
+	{
 		$q = $this->modx->newQuery($this->classKey);
 		$q->select('id');
 		$q->sortby('rank ASC, id', 'ASC');
@@ -57,4 +65,5 @@ class vpEventSortProcessor extends modObjectProcessor {
 		}
 	}
 }
+
 return 'vpEventSortProcessor';

@@ -1,5 +1,7 @@
 <?php
-class vpEventUpdateProcessor extends modObjectUpdateProcessor {
+
+class vpEventUpdateProcessor extends modObjectUpdateProcessor
+{
 	public $classKey = 'vpEvent';
 	public $languageTopics = array('virtualpage');
 	public $permission = 'vpsetting_save';
@@ -7,7 +9,8 @@ class vpEventUpdateProcessor extends modObjectUpdateProcessor {
 	public $nameEvent;
 
 	/** {@inheritDoc} */
-	public function initialize() {
+	public function initialize()
+	{
 		if (!$this->modx->hasPermission($this->permission)) {
 			return $this->modx->lexicon('access_denied');
 		}
@@ -17,9 +20,11 @@ class vpEventUpdateProcessor extends modObjectUpdateProcessor {
 
 		return parent::initialize();
 	}
+
 	/** {@inheritDoc} */
-	public function beforeSet() {
-		if ($this->modx->getObject('vpEvent',array('name' => $this->getProperty('name'), 'id:!=' => $this->getProperty('id') ))) {
+	public function beforeSet()
+	{
+		if ($this->modx->getObject('vpEvent', array('name' => $this->getProperty('name'), 'id:!=' => $this->getProperty('id')))) {
 			$this->modx->error->addField('name', $this->modx->lexicon('vp_err_ae'));
 		}
 
@@ -27,4 +32,5 @@ class vpEventUpdateProcessor extends modObjectUpdateProcessor {
 	}
 
 }
+
 return 'vpEventUpdateProcessor';
