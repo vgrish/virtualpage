@@ -2,56 +2,45 @@
 
 class vpRouteUpdateProcessor extends modObjectUpdateProcessor
 {
-	public $classKey = 'vpRoute';
-	public $languageTopics = array('virtualpage');
-	public $permission = 'vpsetting_save';
+    public $classKey = 'vpRoute';
+    public $languageTopics = array('virtualpage');
+    public $permission = 'vpsetting_save';
 
-	/** {@inheritDoc} */
-	public function initialize()
-	{
-		if (!$this->modx->hasPermission($this->permission)) {
-			return $this->modx->lexicon('access_denied');
-		}
+    /** @var virtualpage $virtualpage */
+    public $virtualpage;
 
-		return parent::initialize();
-	}
+    public function initialize()
+    {
+        if (!$this->modx->hasPermission($this->permission)) {
+            return $this->modx->lexicon('access_denied');
+        }
+        $this->virtualpage = $this->modx->getService('virtualpage');
 
-	/** {@inheritDoc} */
-	public function beforeSet()
-	{
-		if ($this->modx->getObject('vpRoute', array(
-			'route' => $this->getProperty('route'),
-			'metod' => $this->getProperty('metod'),
-			'id:!=' => $this->getProperty('id'),
-			'active' => 1
-		))
-		) {
-			$this->modx->error->addField('route', $this->modx->lexicon('vp_err_ae'));
-		}
-		$id = $this->object->get('id');
-		$eventId = $this->object->get('event');
+        return parent::initialize();
+    }
 
-		if ($event = $this->modx->getObject('vpEvent', $eventId)) {
-			$eventName = $event->get('name');
-		}
-		if (!$route = $this->modx->getObject('vpRoute', array('id:!=' => $id, 'event' => $eventId))) {
-			$this->modx->virtualpage->doEvent('remove', $eventName, 'vpEvent', 10);
-		}
+    /** {@inheritDoc} */
+    public function beforeSet()
+    {
+        if ($this->modx->getCount('vpRoute', array(
+            'id:!=' => $this->getProperty('id'),
+            'route' => $this->getProperty('route'),
+            'metod' => $this->getProperty('metod'),
+        ))
+        ) {
+            $this->modx->error->addField('route', $this->modx->lexicon('vp_err_ae'));
+        }
 
-		return parent::beforeSet();
-	}
+        return parent::beforeSet();
+    }
 
-	/** {@inheritDoc} */
-	public function afterSave()
-	{
-		if ($event = $this->modx->getObject('vpEvent', $this->object->get('event'))) {
-			$eventName = $event->get('name');
-			/* set event */
-			$this->modx->virtualpage->doEvent('create', $eventName, 'vpEvent', 10);
-		}
+    /** {@inheritDoc} */
+    public function afterSave()
+    {
+        $this->virtualpage->clearAllCache();
 
-		return parent::afterSave();
-	}
+        return parent::afterSave();
+    }
 
 }
 

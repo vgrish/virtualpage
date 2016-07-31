@@ -1,5 +1,13 @@
 Changelog for virtualpage.
 
+2.0.0-beta
+==============
+- Full refactoring
+
+1.1.0-beta
+==============
+- update FastRoute
+
 1.0.9-beta
 ==============
 - added new event: "vpOnResourceAfterCreate"

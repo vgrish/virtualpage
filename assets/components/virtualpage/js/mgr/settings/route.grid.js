@@ -107,7 +107,7 @@ Ext.extend(virtualpage.grid.Route, MODx.grid.Grid, {
                     xtype: 'virtualpage-combo-handler',
                     allowBlank: false
                 },
-                renderer: virtualpage.utils.renderHandler
+                renderer: virtualpage.tools.renderHandler
             },
             event: {
                 width: 35,
@@ -116,7 +116,7 @@ Ext.extend(virtualpage.grid.Route, MODx.grid.Grid, {
                     xtype: 'virtualpage-combo-event',
                     allowBlank: false
                 },
-                renderer: virtualpage.utils.renderEvent
+                renderer: virtualpage.tools.renderEvent
             },
             active: {
                 width: 35,

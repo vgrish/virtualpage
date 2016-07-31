@@ -1,2 +1,5 @@
 <?php
-class vpHandler extends xPDOSimpleObject {}
+
+class vpHandler extends xPDOSimpleObject
+{
+}

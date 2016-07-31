@@ -98,7 +98,7 @@ Ext.extend(virtualpage.grid.Handler, MODx.grid.Grid, {
                     xtype: 'virtualpage-combo-type',
                     allowBlank: false
                 },
-                renderer: virtualpage.utils.renderType
+                renderer: virtualpage.tools.renderType
             },
             entry: {
                 width: 50,

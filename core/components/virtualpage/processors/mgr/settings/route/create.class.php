@@ -2,53 +2,54 @@
 
 class vpRouteCreateProcessor extends modObjectCreateProcessor
 {
-	public $classKey = 'vpRoute';
-	public $languageTopics = array('virtualpage');
-	public $permission = 'vpsetting_save';
+    public $classKey = 'vpRoute';
+    public $languageTopics = array('virtualpage');
+    public $permission = 'vpsetting_save';
 
-	/** {@inheritDoc} */
-	public function initialize()
-	{
-		if (!$this->modx->hasPermission($this->permission)) {
-			return $this->modx->lexicon('access_denied');
-		}
-		return parent::initialize();
-	}
+    /** @var virtualpage $virtualpage */
+    public $virtualpage;
 
-	/** {@inheritDoc} */
-	public function beforeSet()
-	{
-		if ($this->modx->getObject('vpRoute', array(
-			'route' => $this->getProperty('route'),
-			'metod' => $this->getProperty('metod'),
-		))
-		) {
-			$this->modx->error->addField('route', $this->modx->lexicon('vp_err_ae'));
-		}
-		return !$this->hasErrors();
-	}
+    public function initialize()
+    {
+        if (!$this->modx->hasPermission($this->permission)) {
+            return $this->modx->lexicon('access_denied');
+        }
+        $this->virtualpage = $this->modx->getService('virtualpage');
 
-	/** {@inheritDoc} */
-	public function beforeSave()
-	{
-		$this->object->fromArray(array(
-			'rank' => $this->modx->getCount('vpRoute')
-		));
-		return parent::beforeSave();
-	}
+        return parent::initialize();
+    }
 
-	/** {@inheritDoc} */
-	public function afterSave()
-	{
-		$eventId = $this->object->get('event');
-		if ($event = $this->modx->getObject('vpEvent', $eventId)) {
-			$eventName = $event->get('name');
-			// set event
-			$this->modx->virtualpage->doEvent('create', $eventName, 'vpEvent', 10);
-		}
+    /** {@inheritDoc} */
+    public function beforeSet()
+    {
+        if ($this->modx->getCount('vpRoute', array(
+            'route' => $this->getProperty('route'),
+            'metod' => $this->getProperty('metod'),
+        ))
+        ) {
+            $this->modx->error->addField('route', $this->modx->lexicon('vp_err_ae'));
+        }
 
-		return parent::afterSave();
-	}
+        return !$this->hasErrors();
+    }
+
+    /** {@inheritDoc} */
+    public function beforeSave()
+    {
+        $this->object->fromArray(array(
+            'rank' => $this->modx->getCount('vpRoute')
+        ));
+
+        return parent::beforeSave();
+    }
+
+    /** {@inheritDoc} */
+    public function afterSave()
+    {
+        $this->virtualpage->clearAllCache();
+
+        return parent::afterSave();
+    }
 }
 
 return 'vpRouteCreateProcessor';

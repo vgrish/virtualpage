@@ -1,8 +1,10 @@
 <?php
 /** @var array $scriptProperties */
 /** @var virtualpage $virtualpage */
-if (!$virtualpage = $modx->getService('virtualpage', 'virtualpage', $modx->getOption('virtualpage_core_path', null, $modx->getOption('core_path') . 'components/virtualpage/') . 'model/virtualpage/', $scriptProperties)) {
-	return 'Could not load virtualpage class!';
+if (!$virtualpage = $modx->getService('virtualpage', 'virtualpage', $modx->getOption('virtualpage_core_path', null,
+        $modx->getOption('core_path') . 'components/virtualpage/') . 'model/virtualpage/', $scriptProperties)
+) {
+    return 'Could not load virtualpage class!';
 }
 
 // Do your snippet code here. This demo grabs 5 items from our custom table.
@@ -23,16 +25,16 @@ $items = $modx->getIterator('virtualpageItem', $c);
 $list = array();
 /** @var virtualpageItem $item */
 foreach ($items as $item) {
-	$list[] = $modx->getChunk($tpl, $item->toArray());
+    $list[] = $modx->getChunk($tpl, $item->toArray());
 }
 
 // Output
 $output = implode($outputSeparator, $list);
 if (!empty($toPlaceholder)) {
-	// If using a placeholder, output nothing and set output to specified placeholder
-	$modx->setPlaceholder($toPlaceholder, $output);
+    // If using a placeholder, output nothing and set output to specified placeholder
+    $modx->setPlaceholder($toPlaceholder, $output);
 
-	return '';
+    return '';
 }
 // By default just return output
 return $output;

@@ -2,35 +2,44 @@
 
 class vpEventUpdateProcessor extends modObjectUpdateProcessor
 {
-	public $classKey = 'vpEvent';
-	public $languageTopics = array('virtualpage');
-	public $permission = 'vpsetting_save';
+    public $classKey = 'vpEvent';
+    public $languageTopics = array('virtualpage');
+    public $permission = 'vpsetting_save';
 
-	public $nameEvent;
+    /** @var virtualpage $virtualpage */
+    public $virtualpage;
 
-	/** {@inheritDoc} */
-	public function initialize()
-	{
-		if (!$this->modx->hasPermission($this->permission)) {
-			return $this->modx->lexicon('access_denied');
-		}
-		if ($Event = $this->modx->getObject('vpEvent', $this->getProperty('id'))) {
-			$this->nameEvent = $Event->get('name');
-		}
+    public function initialize()
+    {
+        if (!$this->modx->hasPermission($this->permission)) {
+            return $this->modx->lexicon('access_denied');
+        }
+        $this->virtualpage = $this->modx->getService('virtualpage');
 
-		return parent::initialize();
-	}
+        return parent::initialize();
+    }
 
-	/** {@inheritDoc} */
-	public function beforeSet()
-	{
-		if ($this->modx->getObject('vpEvent', array('name' => $this->getProperty('name'), 'id:!=' => $this->getProperty('id')))) {
-			$this->modx->error->addField('name', $this->modx->lexicon('vp_err_ae'));
-		}
+    /** {@inheritDoc} */
+    public function beforeSet()
+    {
+        if ($this->modx->getCount('vpEvent', array(
+            'id:!=' => $this->getProperty('id'),
+            'name'  => $this->getProperty('name'),
+        ))
+        ) {
+            $this->modx->error->addField('name', $this->modx->lexicon('vp_err_ae'));
+        }
 
-		return parent::beforeSet();
-	}
+        return parent::beforeSet();
+    }
 
+    /** {@inheritDoc} */
+    public function afterSave()
+    {
+        $this->virtualpage->clearAllCache();
+
+        return parent::afterSave();
+    }
 }
 
 return 'vpEventUpdateProcessor';

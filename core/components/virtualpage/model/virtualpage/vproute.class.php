@@ -1,2 +1,5 @@
 <?php
-class vpRoute extends xPDOSimpleObject {}
+
+class vpRoute extends xPDOSimpleObject
+{
+}

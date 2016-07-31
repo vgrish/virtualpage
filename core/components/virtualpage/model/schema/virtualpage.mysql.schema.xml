@@ -3,43 +3,52 @@
 	   version="1.1">
 
 	<object class="vpRoute" table="vp_routes" extends="xPDOSimpleObject">
-		<field key="metod" dbtype="varchar" precision="255" phptype="string" null="false" />
-		<field key="route" dbtype="varchar" precision="255" phptype="string" null="false" />
-		<field key="handler" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
+		<field key="metod" dbtype="varchar" precision="255" phptype="string" null="false"/>
+		<field key="route" dbtype="varchar" precision="255" phptype="string" null="false"/>
+		<field key="handler" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false"
+			   default="0"/>
 
-		<field key="event" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
-		<field key="description" dbtype="text" phptype="string" null="true" />
-		<field key="rank" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="true" default="0" />
-		<field key="active" dbtype="tinyint" precision="1" phptype="integer" null="true" default="1" />
-		<field key="properties" dbtype="text" phptype="json" null="true" />
+		<field key="event" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false"
+			   default="0"/>
+		<field key="description" dbtype="text" phptype="string" null="true"/>
+		<field key="rank" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="true"
+			   default="0"/>
+		<field key="active" dbtype="tinyint" precision="1" phptype="integer" null="true" default="1"/>
+		<field key="properties" dbtype="text" phptype="json" null="true"/>
 
-		<aggregate alias="Event" class="vpEvent" local="event" foreign="id" owner="foreign" cardinality="one" />
-		<aggregate alias="Handler" class="vpHandler" local="handler" foreign="id" owner="foreign" cardinality="one" />
-
-	</object>
-
-	<object class="vpEvent" table="vp_events" extends="xPDOSimpleObject">
-		<field key="name" dbtype="varchar" precision="255" phptype="string" null="false" />
-		<field key="description" dbtype="text" phptype="string" null="true" />
-		<field key="rank" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="true" default="0" />
-		<field key="active" dbtype="tinyint" precision="1" phptype="integer" null="true" default="1" />
-
-		<composite alias="Routes" class="vpRoute" local="id" foreign="event" owner="local" cardinality="many" />
+		<aggregate alias="Event" class="vpEvent" local="event" foreign="id" owner="foreign" cardinality="one"/>
+		<aggregate alias="Handler" class="vpHandler" local="handler" foreign="id" owner="foreign" cardinality="one"/>
 
 	</object>
+
 
 	<object class="vpHandler" table="vp_handlers" extends="xPDOSimpleObject">
-		<field key="name" dbtype="varchar" precision="255" phptype="string" null="false" />
-		<field key="type" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" />
-		<field key="entry" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
-		<field key="content" dbtype="text" phptype="string" null="true" />
-		<field key="description" dbtype="text" phptype="string" null="true" />
-		<field key="cache" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="true" default="0" />
-		<field key="rank" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="true" default="0" />
-		<field key="active" dbtype="tinyint" precision="1" phptype="integer" null="true" default="1" />
+		<field key="name" dbtype="varchar" precision="255" phptype="string" null="false"/>
+		<field key="type" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0"/>
+		<field key="entry" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" default="0"/>
+		<field key="content" dbtype="text" phptype="string" null="true"/>
+		<field key="description" dbtype="text" phptype="string" null="true"/>
+		<field key="cache" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="true"
+			   default="0"/>
+		<field key="rank" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="true"
+			   default="0"/>
+		<field key="active" dbtype="tinyint" precision="1" phptype="integer" null="true" default="1"/>
 
-		<composite alias="Routes" class="vpRoute" local="id" foreign="handler" owner="local" cardinality="many" />
+		<composite alias="Routes" class="vpRoute" local="id" foreign="handler" owner="local" cardinality="many"/>
 
 	</object>
+
+
+	<object class="vpEvent" table="vp_events" extends="xPDOSimpleObject">
+		<field key="name" dbtype="varchar" precision="255" phptype="string" null="false"/>
+		<field key="description" dbtype="text" phptype="string" null="true"/>
+		<field key="rank" dbtype="tinyint" precision="1" attributes="unsigned" phptype="integer" null="true"
+			   default="0"/>
+		<field key="active" dbtype="tinyint" precision="1" phptype="integer" null="true" default="1"/>
+
+		<composite alias="Routes" class="vpRoute" local="id" foreign="event" owner="local" cardinality="many"/>
+
+	</object>
+
 
 </model>

@@ -2,34 +2,29 @@
 
 class vpRouteRemoveProcessor extends modObjectRemoveProcessor
 {
-	public $classKey = 'vpRoute';
-	public $languageTopics = array('virtualpage');
-	public $permission = 'vpsetting_save';
+    public $classKey = 'vpRoute';
+    public $languageTopics = array('virtualpage');
+    public $permission = 'vpsetting_save';
 
-	public $eventName;
+    /** @var virtualpage $virtualpage */
+    public $virtualpage;
 
-	/** {@inheritDoc} */
-	public function initialize()
-	{
-		if (!$this->modx->hasPermission($this->permission)) {
-			return $this->modx->lexicon('access_denied');
-		}
-		if ($event = $this->modx->getObject('vpEvent', array('id' => $this->getProperty('event')))) {
-			$this->eventName = $event->get('name');
-		}
+    public function initialize()
+    {
+        if (!$this->modx->hasPermission($this->permission)) {
+            return $this->modx->lexicon('access_denied');
+        }
+        $this->virtualpage = $this->modx->getService('virtualpage');
 
-		return parent::initialize();
-	}
+        return parent::initialize();
+    }
 
-	public function afterRemove()
-	{
-		if (!$this->modx->getCount('vpRoute', array('event' => $this->getProperty('event')))) {
-			/* remove event */
-			$this->modx->virtualpage->doEvent('remove', $this->eventName, 'vpEvent', 10);
-		}
+    public function afterRemove()
+    {
+        $this->virtualpage->clearAllCache();
 
-		return parent::afterRemove();
-	}
+        return parent::afterRemove();
+    }
 
 }
 
