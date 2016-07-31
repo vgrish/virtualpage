@@ -6,12 +6,15 @@ class vpHandlerUpdateProcessor extends modObjectUpdateProcessor
     public $languageTopics = array('virtualpage');
     public $permission = 'vpsetting_save';
 
-    /** {@inheritDoc} */
+    /** @var virtualpage $virtualpage */
+    public $virtualpage;
+
     public function initialize()
     {
         if (!$this->modx->hasPermission($this->permission)) {
             return $this->modx->lexicon('access_denied');
         }
+        $this->virtualpage = $this->modx->getService('virtualpage');
 
         return parent::initialize();
     }
@@ -30,6 +33,14 @@ class vpHandlerUpdateProcessor extends modObjectUpdateProcessor
         return parent::beforeSet();
     }
 
+    /** {@inheritDoc} */
+    public function afterSave()
+    {
+        $this->virtualpage->clearAllCache();
+
+        return parent::afterSave();
+    }
+    
 }
 
 return 'vpHandlerUpdateProcessor';

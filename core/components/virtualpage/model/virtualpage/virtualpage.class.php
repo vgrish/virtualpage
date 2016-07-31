@@ -235,12 +235,16 @@ class virtualpage
 
             $q = $this->modx->newQuery('vpRoute');
             $q->innerJoin('vpEvent', 'vpEvent', "vpEvent.id = vpRoute.event");
+            $q->innerJoin('vpHandler', 'vpHandler', "vpHandler.id = vpRoute.handler");
+
             $q->where(array(
-                "vpRoute.active" => 1,
-                "vpEvent.active" => 1,
+                "vpRoute.active"   => 1,
+                "vpEvent.active"   => 1,
+                "vpHandler.active" => 1,
             ));
             $q->sortby("vpRoute.rank", "ASC");
             $q->select('vpRoute.metod, vpRoute.route, vpRoute.handler, vpRoute.properties, vpEvent.name as event');
+            $q->select($this->modx->getSelectColumns('vpHandler', 'vpHandler', 'handler_'));
 
             if ($q->prepare() AND $q->stmt->execute()) {
                 while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -359,21 +363,13 @@ class virtualpage
         @list($found, $handlerId, $fastroute) = $dispatcher->dispatch($this->getMethod(), $uri);
 
         if ($found == FastRoute\Dispatcher::FOUND) {
-            foreach ($virtualPageRoutes as $row) {
+            foreach ($virtualPageRoutes as $data) {
                 $match = array();
-                preg_match_all("/{([^}]+)}*/i", $row['route'], $match);
-                $url = str_replace($match[0], array_values($fastroute), $row['route']);
-                if (
-                    $url == $uri
-                    AND
-                    $handler = $this->modx->getObject('vpHandler', array('id' => $handlerId, 'active' => 1))
-                ) {
-                    $data = array(
-                        'uri'       => $uri,
-                        'route'     => $row,
-                        'fastroute' => $fastroute,
-                        'handler'   => $handler->toArray(),
-                    );
+                preg_match_all("/{([^}]+)}*/i", $data['route'], $match);
+                $url = str_replace($match[0], array_values($fastroute), $data['route']);
+                if ($url == $uri) {
+                    $data['uri'] = $uri;
+                    $data['fastroute'] = $fastroute;
 
                     return $this->handle($data);
                 }
@@ -397,10 +393,9 @@ class virtualpage
             'data' => $data,
         ));
 
-        $handler = $this->getOption('handler', $data, array(), true);
-        $type = $this->getOption('type', $handler);
-        $entry = $this->getOption('entry', $handler);
-        $cache = (boolean)$this->getOption('cache', $handler);
+        $type = $this->getOption('handler_type', $data);
+        $entry = $this->getOption('handler_entry', $data);
+        $cache = (boolean)$this->getOption('handler_cache', $data);
 
         switch ($type) {
             case 0:
@@ -642,15 +637,13 @@ class virtualpage
      */
     public function newResource(array $data = array())
     {
-        $handler = $this->getOption('handler', $data, array(), true);
-
         /** @var modResource $resource */
         if ($resource = $this->modx->newObject('modResource')) {
             $resource->fromArray(array(
-                'pagetitle' => $handler['description'] ?: $handler['name'],
-                'content'   => $handler['content'],
-                'template'  => $handler['entry'],
-                'cacheable' => $handler['cache'],
+                'pagetitle' => $data['handler_description'] ?: $data['handler_name'],
+                'content'   => $data['handler_content'],
+                'template'  => $data['handler_entry'],
+                'cacheable' => $data['handler_cache'],
                 'uri'       => $data['uri'],
                 'published' => true,
                 'id'        => $this->modx->getOption('site_start')

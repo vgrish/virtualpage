@@ -6,12 +6,15 @@ class vpHandlerCreateProcessor extends modObjectCreateProcessor
     public $languageTopics = array('virtualpage');
     public $permission = 'vpsetting_save';
 
-    /** {@inheritDoc} */
+    /** @var virtualpage $virtualpage */
+    public $virtualpage;
+
     public function initialize()
     {
         if (!$this->modx->hasPermission($this->permission)) {
             return $this->modx->lexicon('access_denied');
         }
+        $this->virtualpage = $this->modx->getService('virtualpage');
 
         return parent::initialize();
     }
@@ -37,6 +40,14 @@ class vpHandlerCreateProcessor extends modObjectCreateProcessor
         ));
 
         return parent::beforeSave();
+    }
+
+    /** {@inheritDoc} */
+    public function afterSave()
+    {
+        $this->virtualpage->clearAllCache();
+
+        return parent::afterSave();
     }
 
 }
