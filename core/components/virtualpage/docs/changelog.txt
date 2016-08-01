@@ -1,6 +1,6 @@
 Changelog for virtualpage.
 
-2.0.0-beta
+2.0.0-beta (01.08.2016)
 ==============
 - Full refactoring
 
