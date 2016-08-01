@@ -223,6 +223,39 @@ class virtualpage
         return $array;
     }
 
+    /**
+     * @param        $subject
+     * @param string $prefix
+     * @param string $separator
+     * @param bool   $restore
+     *
+     * @return array
+     */
+    public function setPlaceholders($subject, $prefix = 'vp', $separator = '.', $restore = false)
+    {
+        $keys = array();
+        $restored = array();
+        if (is_array($subject)) {
+            foreach ($subject as $key => $value) {
+                $rv = $this->modx->toPlaceholder($key, $value, $prefix, $separator, $restore);
+                if (isset($rv['keys'])) {
+                    foreach ($rv['keys'] as $rvKey) {
+                        $keys[] = $rvKey;
+                    }
+                }
+                if ($restore === true && isset($rv['restore'])) {
+                    $restored = array_merge($restored, $rv['restore']);
+                }
+            }
+        }
+        $return = array('keys' => $keys);
+        if ($restore === true) {
+            $return['restore'] = $restored;
+        }
+
+        return $return;
+    }
+
 
     public function getAllRoutes()
     {
@@ -421,8 +454,8 @@ class virtualpage
 
     public function process($object = 'modSnippet', $entry = 0, $data, $cache = false)
     {
-        $prefix = $this->getOption('prefix_placeholder', null, 'vp.', true);
-        $this->modx->setPlaceholders($data, $prefix);
+        $prefix = trim($this->getOption('prefix_placeholder', null, 'vp.', true), '.');
+        $this->setPlaceholders($data, $prefix);
 
         $key = $this->getOption('fastrouter_key', null, 'fastrouter', true);
         $_REQUEST += array($key => $data);
