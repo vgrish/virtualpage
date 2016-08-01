@@ -1,8 +1,8 @@
 <?php
 
-class vpHandlerUpdateProcessor extends modObjectUpdateProcessor
+class vpRouteUpdateProcessor extends modObjectUpdateProcessor
 {
-    public $classKey = 'vpHandler';
+    public $classKey = 'vpRoute';
     public $languageTopics = array('virtualpage');
     public $permission = 'vpsetting_save';
 
@@ -22,12 +22,13 @@ class vpHandlerUpdateProcessor extends modObjectUpdateProcessor
     /** {@inheritDoc} */
     public function beforeSet()
     {
-        if ($this->modx->getCount('vpHandler', array(
+        if ($this->modx->getCount('vpRoute', array(
             'id:!=' => $this->getProperty('id'),
-            'name'  => $this->getProperty('name'),
+            'route' => $this->getProperty('route'),
+            'metod' => $this->getProperty('metod'),
         ))
         ) {
-            $this->modx->error->addField('name', $this->modx->lexicon('vp_err_ae'));
+            $this->modx->error->addField('route', $this->modx->lexicon('virtualpage_err_ae'));
         }
 
         return parent::beforeSet();
@@ -40,7 +41,7 @@ class vpHandlerUpdateProcessor extends modObjectUpdateProcessor
 
         return parent::afterSave();
     }
-    
+
 }
 
-return 'vpHandlerUpdateProcessor';
+return 'vpRouteUpdateProcessor';

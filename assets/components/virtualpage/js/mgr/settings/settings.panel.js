@@ -1,65 +1,50 @@
-virtualpage.page.Settings = function(config) {
-    config = config || {};
-    Ext.applyIf(config, {
-        components: [{
-            xtype: 'virtualpage-panel-settings',
-            renderTo: 'virtualpage-panel-settings-div'
-        }]
-    });
-    virtualpage.page.Settings.superclass.constructor.call(this, config);
-};
-Ext.extend(virtualpage.page.Settings, MODx.Component);
-Ext.reg('virtualpage-page-settings', virtualpage.page.Settings);
-
 virtualpage.panel.Settings = function(config) {
     config = config || {};
     Ext.apply(config, {
-        border: false,
-        deferredRender: true,
         baseCls: 'modx-formpanel',
+        cls: 'virtualpage-formpanel',
+        layout: 'anchor',
+        hideMode: 'offsets',
         items: [{
-            html: '<h2>' + _('virtualpage') + ' :: ' + _('vp_settings') + '</h2>',
-            border: false,
-            cls: 'modx-page-header container'
-        }, {
             xtype: 'modx-tabs',
-            id: 'virtualpage-settings-tabs',
-            bodyStyle: 'padding: 10px',
             defaults: {
                 border: false,
-                autoHeight: true
+                autoHeight: true,
+                autoWidth: true,
+                deferredRender: false,
+                forceLayout: true
             },
             border: true,
             hideMode: 'offsets',
             items: [{
-                title: _('vp_routes'),
+                title: _('virtualpage_routes'),
+                layout: 'anchor',
                 items: [{
-                    html: '<p>' + _('vp_routes_intro') + '</p>',
-                    border: false,
-                    bodyCssClass: 'panel-desc',
-                    bodyStyle: 'margin-bottom: 10px'
+                    html: _('virtualpage_routes_intro'),
+                    cls: 'panel-desc'
                 }, {
-                    xtype: 'virtualpage-grid-route'
+                    xtype: 'virtualpage-grid-route',
+                    cls: 'virtualpage-grid main-wrapper'
                 }]
             }, {
-                title: _('vp_handlers'),
+                title: _('virtualpage_handlers'),
+                layout: 'anchor',
                 items: [{
-                    html: '<p>' + _('vp_handlers_intro') + '</p>',
-                    border: false,
-                    bodyCssClass: 'panel-desc',
-                    bodyStyle: 'margin-bottom: 10px'
+                    html: _('virtualpage_handlers_intro'),
+                    cls: 'panel-desc'
                 }, {
-                    xtype: 'virtualpage-grid-handler'
+                    xtype: 'virtualpage-grid-handler',
+                    cls: 'virtualpage-grid main-wrapper'
                 }]
             }, {
-                title: _('vp_events'),
+                title: _('virtualpage_events'),
+                layout: 'anchor',
                 items: [{
-                    html: '<p>' + _('vp_events_intro') + '</p>',
-                    border: false,
-                    bodyCssClass: 'panel-desc',
-                    bodyStyle: 'margin-bottom: 10px'
+                    html: _('virtualpage_events_intro'),
+                    cls: 'panel-desc'
                 }, {
-                    xtype: 'virtualpage-grid-event'
+                    xtype: 'virtualpage-grid-event',
+                    cls: 'virtualpage-grid main-wrapper'
                 }]
             }]
         }]

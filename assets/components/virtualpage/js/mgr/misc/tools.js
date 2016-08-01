@@ -18,7 +18,6 @@ virtualpage.tools.renderEvent = function (value, props, row) {
 	return row.json.event_name ? row.json.event_name : value;
 };
 
-
 virtualpage.tools.getMenu = function (actions, grid, selected) {
 	var menu = [];
 	var cls, icon, title, action = '';
@@ -34,8 +33,9 @@ virtualpage.tools.getMenu = function (actions, grid, selected) {
 				menu.push('-');
 			}
 			continue;
-		} else if (menu.length > 0 && /^remove/i.test(a['action'])) {
+		} else if (menu.length > 0 && (/^sep/i.test(a['action']))) {
 			menu.push('-');
+			continue;
 		}
 
 		if (selected.length > 1) {
@@ -56,13 +56,12 @@ virtualpage.tools.getMenu = function (actions, grid, selected) {
 			text: String.format(
 				'<span class="{0}"><i class="x-menu-item-icon {1}"></i>{2}</span>',
 				cls, icon, title
-			),
+			)
 		});
 	}
 
 	return menu;
 };
-
 
 virtualpage.tools.renderActions = function (value, props, row) {
 	var res = [];
@@ -93,4 +92,66 @@ virtualpage.tools.renderActions = function (value, props, row) {
 		'<ul class="virtualpage-row-actions">{0}</ul>',
 		res.join('')
 	);
+};
+
+
+virtualpage.tools.handleChecked = function (checkbox) {
+	var workCount = checkbox.workCount;
+	if (!!!workCount) {
+		workCount = 1;
+	}
+	var hideLabel = checkbox.hideLabel;
+	if (!!!hideLabel) {
+		hideLabel = false;
+	}
+
+	var checked = checkbox.getValue();
+	var nextField = checkbox.nextSibling();
+
+	for (var i = 0; i < workCount; i++) {
+		if (checked) {
+			nextField.show().enable();
+		}
+		else {
+			nextField.hide().disable();
+		}
+		nextField.hideLabel = hideLabel;
+		nextField = nextField.nextSibling();
+	}
+	return true;
+};
+
+
+virtualpage.tools.renderReplace = function(value, replace, color) {
+	if (!value) {
+		return '';
+	} else if (!replace) {
+		return value;
+	}
+	if (!color) {
+		return String.format('<span>{0}</span>', replace);
+	}
+	return String.format('<span class="virtualpage-render-replace" style="color: #{1}">{0}</span>', replace, color);
+};
+
+
+virtualpage.tools.arrayIntersect = function (array1, array2) {
+	var result = array1.filter(function (n) {
+		return array2.indexOf(n) !== -1;
+	});
+
+	return result;
+};
+
+virtualpage.tools.inArray = function (needle, haystack) {
+	for (key in haystack) {
+		if(haystack[key] == needle) return true;
+	}
+
+	return false;
+};
+
+
+virtualpage.tools.empty = function (value) {
+	return (typeof(value) == 'undefined' || value == 0 || value === null || value === false || (typeof(value) == 'string' && value.replace(/\s+/g, '') == '') || (typeof(value) == 'object' && value.length == 0));
 };

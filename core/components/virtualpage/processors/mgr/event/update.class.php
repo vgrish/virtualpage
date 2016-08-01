@@ -1,6 +1,6 @@
 <?php
 
-class vpEventCreateProcessor extends modObjectCreateProcessor
+class vpEventUpdateProcessor extends modObjectUpdateProcessor
 {
     public $classKey = 'vpEvent';
     public $languageTopics = array('virtualpage');
@@ -23,23 +23,14 @@ class vpEventCreateProcessor extends modObjectCreateProcessor
     public function beforeSet()
     {
         if ($this->modx->getCount('vpEvent', array(
-            'name' => $this->getProperty('name')
+            'id:!=' => $this->getProperty('id'),
+            'name'  => $this->getProperty('name'),
         ))
         ) {
-            $this->modx->error->addField('name', $this->modx->lexicon('vp_err_ae'));
+            $this->modx->error->addField('name', $this->modx->lexicon('virtualpage_err_ae'));
         }
 
-        return !$this->hasErrors();
-    }
-
-    /** {@inheritDoc} */
-    public function beforeSave()
-    {
-        $this->object->fromArray(array(
-            'rank' => $this->modx->getCount('vpEvent')
-        ));
-
-        return parent::beforeSave();
+        return parent::beforeSet();
     }
 
     /** {@inheritDoc} */
@@ -49,8 +40,6 @@ class vpEventCreateProcessor extends modObjectCreateProcessor
 
         return parent::afterSave();
     }
-
-
 }
 
-return 'vpEventCreateProcessor';
+return 'vpEventUpdateProcessor';

@@ -1,111 +1,108 @@
-virtualpage.window.UpdateRoute = function(config) {
-    config = config || {};
+virtualpage.window.UpdateRoute = function (config) {
+	config = config || {};
 
-    Ext.applyIf(config, {
-        title: _('vp_menu_update'),
-        url: virtualpage.config.connector_url,
-        action: 'mgr/settings/route/update',
-        fields: this.getFields(config),
-        keys: this.getKeys(config),
-        width: 600,
-        //height: 450,
-        layout: 'anchor',
-        autoHeight: true,
-        cls: 'virtualpage-window ' + (MODx.modx23 ? 'modx23' : 'modx22')
-    });
-    virtualpage.window.UpdateRoute.superclass.constructor.call(this, config);
+	Ext.applyIf(config, {
+		title: _('create'),
+		url: virtualpage.config.connector_url,
+		action: 'mgr/settings/route/update',
+		fields: this.getFields(config),
+		keys: this.getKeys(config),
+		width: 600,
+		autoHeight: true,
+		cls: 'virtualpage-panel-route'
+	});
+	virtualpage.window.UpdateRoute.superclass.constructor.call(this, config);
 };
 Ext.extend(virtualpage.window.UpdateRoute, MODx.Window, {
 
-    getKeys: function() {
-        return [{
-            key: Ext.EventObject.ENTER,
-            shift: true,
-            fn: this.submit,
-            scope: this
-        }];
-    },
+	getKeys: function () {
+		return [{
+			key: Ext.EventObject.ENTER,
+			shift: true,
+			fn: this.submit,
+			scope: this
+		}];
+	},
 
-    getFields: function(config) {
-        return [{
-            xtype: 'hidden',
-            name: 'id'
-        }, {
-            xtype: 'textfield',
-            fieldLabel: _('vp_route'),
-            name: 'route',
-            anchor: '99.5%',
-            allowBlank: false
-        }, {
-            items: [{
-                layout: 'form',
-                cls: 'modx-panel',
-                items: [{
-                    layout: 'column',
-                    border: false,
-                    items: [{
-                        columnWidth: .49,
-                        border: false,
-                        layout: 'form',
-                        items: this.getLeftFields(config)
-                    }, {
-                        columnWidth: .51,
-                        border: false,
-                        layout: 'form',
-                        cls: 'right-column',
-                        items: this.getRightFields(config)
-                    }]
-                }]
-            }]
-        }, {
-            xtype: 'textarea',
-            fieldLabel: _('vp_placeholders'),
-            name: 'properties',
-            anchor: '99.5%'
-        }, {
-            xtype: 'textarea',
-            fieldLabel: _('vp_description'),
-            name: 'description',
-            anchor: '99.5%',
-            height: 50
-        },{
-            xtype: 'checkboxgroup',
-            columns: 4,
-            items: [{
-                xtype: 'xcheckbox',
-                fieldLabel: '',
-                boxLabel: _('vp_active'),
-                name: 'active',
-                checked: config.record.active
-            }]
-        }];
-    },
-
-    getLeftFields: function(config) {
-        return [{
-            xtype: 'virtualpage-combo-metod',
-            fieldLabel: _('vp_metod'),
-            name: 'metod',
-            anchor: '99%',
-            allowBlank: false
-        }, {
-            xtype: 'virtualpage-combo-event',
-            fieldLabel: _('vp_event'),
-            name: 'event',
-            anchor: '99%',
-            allowBlank: false
-        }];
-    },
-
-    getRightFields: function(config) {
-        return [ {
-            xtype: 'virtualpage-combo-handler',
-            fieldLabel: _('vp_handler'),
-            name: 'handler',
-            anchor: '99%',
-            allowBlank: false
-        }];
-    }
+	getFields: function (config) {
+		return [{
+			layout: 'form',
+			defaults: {border: false, anchor: '100%'},
+			items: [{
+				xtype: 'hidden',
+				name: 'id'
+			}, {
+				xtype: 'textfield',
+				fieldLabel: _('virtualpage_route'),
+				name: 'route',
+				allowBlank: false
+			}, {
+				items: [{
+					layout: 'form',
+					cls: 'modx-panel',
+					items: [{
+						layout: 'column',
+						defaults: {border: false, anchor: '100%'},
+						items: [{
+							columnWidth: .49,
+							border: false,
+							layout: 'form',
+							items: [{
+								xtype: 'virtualpage-combo-metod',
+								fieldLabel: _('virtualpage_metod'),
+								name: 'metod',
+								anchor: '100%',
+								allowBlank: false
+							}, {
+								xtype: 'virtualpage-combo-event',
+								fieldLabel: _('virtualpage_event'),
+								name: 'event',
+								anchor: '100%',
+								allowBlank: false
+							}]
+						}, {
+							columnWidth: .51,
+							border: false,
+							layout: 'form',
+							cls: 'right-column',
+							items: [{
+								xtype: 'virtualpage-combo-handler',
+								fieldLabel: _('virtualpage_handler'),
+								name: 'handler',
+								anchor: '100%',
+								allowBlank: false
+							}]
+						}]
+					}]
+				}]
+			}, {
+				xtype: 'textarea',
+				fieldLabel: _('virtualpage_placeholders'),
+				name: 'properties',
+				setValue: function (value) {
+					if (Ext.isObject(value)) {
+						value = Ext.util.JSON.encode(value);
+					}
+					return Ext.form.TextField.superclass.setValue.call(this, value);
+				}
+			}, {
+				xtype: 'textarea',
+				fieldLabel: _('virtualpage_description'),
+				name: 'description',
+				height: 50
+			}, {
+				xtype: 'checkboxgroup',
+				columns: 4,
+				items: [{
+					xtype: 'xcheckbox',
+					fieldLabel: '',
+					boxLabel: _('virtualpage_active'),
+					name: 'active',
+					checked: config.record.active
+				}]
+			}]
+		}];
+	}
 
 });
 Ext.reg('virtualpage-window-route-update', virtualpage.window.UpdateRoute);

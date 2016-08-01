@@ -20,6 +20,8 @@ abstract class virtualpageMainController extends modExtraManagerController
 
         $this->virtualpage = new virtualpage($this->modx);
         $this->addCss($this->virtualpage->config['cssUrl'] . 'mgr/main.css');
+        $this->addCss($this->virtualpage->config['cssUrl'] . 'mgr/bootstrap.buttons.css');
+
         $this->addJavascript($this->virtualpage->config['jsUrl'] . 'mgr/virtualpage.js');
         $this->addHtml('
 		<script type="text/javascript">

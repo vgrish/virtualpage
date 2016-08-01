@@ -3,29 +3,7 @@
 $plugins = array();
 
 $tmp = array(
-    /*'vpService' => array(
-        'file'        => 'virtualpage_s',
-        'description' => '',
-        'locked'      => 0,
-        'events'      => array(
-            'OnHandleRequest'     => array(),
-            'OnBeforeCacheUpdate' => array(),
-        )
-    ),*/
-    /*'vpEvent' => array(
-        'file'        => 'virtualpage',
-        'description' => '',
-        'locked'      => 1,
-        'events'      => array()
-    ),*/
 
-    /*'vpInit'   => array(
-        'file'        => 'init',
-        'description' => '',
-        'events'      => array(
-            'OnMODXInit' => array('priority' => 50),
-        )
-    ),*/
     'vpSystem' => array(
         'file'        => 'system',
         'description' => '',

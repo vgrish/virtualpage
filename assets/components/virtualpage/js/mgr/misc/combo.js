@@ -1,5 +1,58 @@
 Ext.namespace('virtualpage.combo');
 
+
+virtualpage.combo.Search = function (config) {
+	config = config || {};
+	Ext.applyIf(config, {
+		xtype: 'twintrigger',
+		ctCls: 'x-field-search',
+		allowBlank: true,
+		msgTarget: 'under',
+		emptyText: _('search'),
+		name: 'query',
+		triggerAction: 'all',
+		clearBtnCls: 'x-field-search-clear',
+		searchBtnCls: 'x-field-search-go',
+		onTrigger1Click: this._triggerSearch,
+		onTrigger2Click: this._triggerClear
+	});
+	virtualpage.combo.Search.superclass.constructor.call(this, config);
+	this.on('render', function () {
+		this.getEl().addKeyListener(Ext.EventObject.ENTER, function () {
+			this._triggerSearch();
+		}, this);
+	});
+	this.addEvents('clear', 'search');
+};
+Ext.extend(virtualpage.combo.Search, Ext.form.TwinTriggerField, {
+
+	initComponent: function () {
+		Ext.form.TwinTriggerField.superclass.initComponent.call(this);
+		this.triggerConfig = {
+			tag: 'span',
+			cls: 'x-field-search-btns',
+			cn: [{
+				tag: 'div',
+				cls: 'x-form-trigger ' + this.searchBtnCls
+			}, {
+				tag: 'div',
+				cls: 'x-form-trigger ' + this.clearBtnCls
+			}]
+		};
+	},
+
+	_triggerSearch: function () {
+		this.fireEvent('search', this);
+	},
+
+	_triggerClear: function () {
+		this.fireEvent('clear', this);
+	}
+
+});
+Ext.reg('virtualpage-field-search', virtualpage.combo.Search);
+
+
 virtualpage.combo.PluginEvent = function(config) {
 	config = config || {};
 	Ext.applyIf(config, {
@@ -11,7 +64,7 @@ virtualpage.combo.PluginEvent = function(config) {
 		editable: true,
 		fields: ['name', 'service', 'groupname', 'enabled', 'priority', 'propertyset', 'menu'],
 		pageSize: 10,
-		emptyText: _('vp_combo_select'),
+		emptyText: _('virtualpage_combo_select'),
 		hideMode: 'offsets',
 		url: virtualpage.config.connector_url,
 		baseParams: {
@@ -34,7 +87,7 @@ virtualpage.combo.Event = function(config) {
 		valueField: 'id',
 		fields: ['name', 'id'],
 		pageSize: 10,
-		emptyText: _('vp_combo_select'),
+		emptyText: _('virtualpage_combo_select'),
 		hideMode: 'offsets',
 		url: virtualpage.config.connector_url,
 		baseParams: {
@@ -58,7 +111,7 @@ virtualpage.combo.Handler = function(config) {
 		valueField: 'id',
 		fields: ['name', 'id'],
 		pageSize: 10,
-		emptyText: _('vp_combo_select'),
+		emptyText: _('virtualpage_combo_select'),
 		hideMode: 'offsets',
 		url: virtualpage.config.connector_url,
 		baseParams: {
@@ -80,9 +133,9 @@ virtualpage.combo.Metod = function(config) {
 			id: 0,
 			fields: ['metod', 'display'],
 			data: [
-				['GET,POST', _('vp_metod_get_post')],
-				['GET', _('vp_metod_get')],
-				['POST', _('vp_metod_post')]
+				['GET,POST', _('virtualpage_metod_get_post')],
+				['GET', _('virtualpage_metod_get')],
+				['POST', _('virtualpage_metod_post')]
 			]
 		}),
 		mode: 'local',
@@ -103,10 +156,10 @@ virtualpage.combo.Type = function(config) {
 			id: 0,
 			fields: ['type', 'display'],
 			data: [
-				[0, _('vp_type_resource')],
-				[3, _('vp_type_dynamic_resource')],
-				[1, _('vp_type_snippet')],
-				[2, _('vp_type_chunk')]
+				[0, _('virtualpage_type_resource')],
+				[3, _('virtualpage_type_dynamic_resource')],
+				[1, _('virtualpage_type_snippet')],
+				[2, _('virtualpage_type_chunk')]
 			]
 		}),
 		mode: 'local',
@@ -131,14 +184,13 @@ virtualpage.combo.Entry = function(config) {
 		editable: true,
 		fields: ['id', 'name'],
 		pageSize: 10,
-		emptyText: _('vp_combo_select'),
+		emptyText: _('virtualpage_combo_select'),
 		hideMode: 'offsets',
 		url: virtualpage.config.connector_url,
 		baseParams: {
 			action: 'mgr/misc/entry/getlist',
 			element: 'resource',
 			combo: true,
-			limit: 0
 		}
 	});
 	virtualpage.combo.Entry.superclass.constructor.call(this, config);

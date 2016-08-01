@@ -1,20 +1,19 @@
 <?php
 
-$files = scandir(dirname(__FILE__));
-foreach ($files as $file) {
-    @include_once($file);
-}
+include_once 'errors.inc.php';
+include_once 'manager.inc.php';
+include_once 'setting.inc.php';
 
 $_lang['virtualpage'] = 'VirtualPage';
-$_lang['vp_menu_desc'] = 'Managing virtual pages.';
+$_lang['virtualpage_menu_desc'] = 'Управление виртуальными страницами.';
 
-$_lang['vp_settings'] = 'Settings';
+$_lang['virtualpage_settings'] = 'Настройки';
 
-$_lang['vp_routes'] = 'Routes';
-$_lang['vp_routes_intro'] = 'Control panel routes.';
+$_lang['virtualpage_routes'] = 'Маршруты';
+$_lang['virtualpage_routes_intro'] = 'Панель управления маршрутами.';
 
-$_lang['vp_events'] = 'Events';
-$_lang['vp_events_intro'] = 'Control panel events.';
+$_lang['virtualpage_events'] = 'События';
+$_lang['virtualpage_events_intro'] = 'Панель управления событиями.';
 
-$_lang['vp_handlers'] = 'Handlers';
-$_lang['vp_handlers_intro'] = 'Control panel handlers.';
+$_lang['virtualpage_handlers'] = 'Обработчики';
+$_lang['virtualpage_handlers_intro'] = 'Панель управления обработчиками.';

@@ -1,5 +1,5 @@
 .x-grid3-col-actions {
-	padding: 3px 0 3px 5px;
+	padding: 6px 0 6px 6px;
 }
 
 ul.virtualpage-row-actions {
@@ -13,7 +13,7 @@ ul.virtualpage-row-actions li {
 }
 
 ul.virtualpage-row-actions .btn {
-	padding: 5px;
+	padding: 3px;
 	margin-right: 2px;
 	min-width: 26px;
 	font-size: inherit;
@@ -25,25 +25,18 @@ ul.virtualpage-row-actions .btn {
 	color: #555;
 }
 
-.action-red {
-	color: darkred !important;
+.virtualpage-formpanel {
+	padding-top: 25px;
 }
 
-.action-green {
-	color: darkgreen !important;
+.virtualpage-formpanel .panel-desc {
+	margin-top: 5px;
+	padding: 9px 20px 9px 10px!important;
 }
 
-.action-blue {
-	color: cadetblue !important;
-}
-
-.action-yellow {
-	color: goldenrod !important;
-}
-
-.action-gray {
-	color: dimgray !important;
-}
+/*.virtualpage-grid .x-panel-tbar-noheader {
+	_margin-top: -10px!important;
+}*/
 
 a.x-menu-item .x-menu-item-text, a.x-menu-item .x-menu-item-text .icon {
 	cursor: pointer;
@@ -67,3 +60,81 @@ a.x-menu-item .x-menu-item-text .icon {
 ul.virtualpage-row-actions .actions-menu {width: 40px;}
 ul.virtualpage-row-actions .actions-menu:after {content: " \f107";}
 */
+
+/* icon in button */
+.ext-strict .x-menu-item-icon.fa {
+	left: 6px;
+}
+/* actions menu */
+.btn.actions-menu {width: 40px;}
+.btn.actions-menu:after {content: " \f107";}
+/* actions menu */
+.virtualpage-cogs img {
+	_display: none;
+}
+.virtualpage-cogs {
+	padding: 3px 20px 3px 6px!important;
+}
+.virtualpage-cogs i.fa {
+	padding-right: 3px;
+	width: 15px;
+}
+/* description field */
+p.desc {
+	margin: 20px 0px -30px 40px;
+	max-width: 350px;
+	color: #000;
+}
+
+
+/* expander */
+table.virtualpage-expander td {
+	padding-left: 15px;
+}
+table.virtualpage-expander {
+	margin: 30px 0px 0px 0px;
+	color: #000;
+}
+table.virtualpage-expander td b {
+	text-align: left;
+	margin-right: 20px;
+}
+.virtualpage-grid .grid-with-buttons .x-grid3-row-expanded .x-grid3-row-body {
+	padding: 10px 25px 10px;
+}
+
+
+/* color */
+.red {
+	color: red !important;
+}
+.green {
+	color: green !important;
+}
+.blue {
+	color: blue !important;
+}
+.yellow {
+	color: goldenrod !important;
+}
+.gray {
+	color: dimgray !important;
+}
+
+/* search field */
+.x-field-search-clear,
+.x-field-search-go {border-left: 1px solid #e4e4e4 !important;}
+.x-field-search-clear:hover,
+.x-field-search-go:hover {border-left-color: transparent !important;}
+.x-field-search-clear:before {content: '\f00d' !important;}
+.x-field-search-go {right: 31px !important; border-radius: 0 !important;}
+.x-field-search-go:before {content: '\f002' !important;}
+
+
+.virtualpage-html-mg10 {
+	margin: 10px 0;
+}
+
+.virtualpage-html-mg15 {
+	margin: 15px 0;
+}

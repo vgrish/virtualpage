@@ -1,8 +1,8 @@
 <?php
 
-class vpHandlerCreateProcessor extends modObjectCreateProcessor
+class vpRouteCreateProcessor extends modObjectCreateProcessor
 {
-    public $classKey = 'vpHandler';
+    public $classKey = 'vpRoute';
     public $languageTopics = array('virtualpage');
     public $permission = 'vpsetting_save';
 
@@ -22,11 +22,12 @@ class vpHandlerCreateProcessor extends modObjectCreateProcessor
     /** {@inheritDoc} */
     public function beforeSet()
     {
-        if ($this->modx->getCount('vpHandler', array(
-            'name' => $this->getProperty('name')
+        if ($this->modx->getCount('vpRoute', array(
+            'route' => $this->getProperty('route'),
+            'metod' => $this->getProperty('metod'),
         ))
         ) {
-            $this->modx->error->addField('name', $this->modx->lexicon('vp_err_ae'));
+            $this->modx->error->addField('route', $this->modx->lexicon('virtualpage_err_ae'));
         }
 
         return !$this->hasErrors();
@@ -36,7 +37,7 @@ class vpHandlerCreateProcessor extends modObjectCreateProcessor
     public function beforeSave()
     {
         $this->object->fromArray(array(
-            'rank' => $this->modx->getCount('vpHandler')
+            'rank' => $this->modx->getCount('vpRoute')
         ));
 
         return parent::beforeSave();
@@ -49,7 +50,6 @@ class vpHandlerCreateProcessor extends modObjectCreateProcessor
 
         return parent::afterSave();
     }
-
 }
 
-return 'vpHandlerCreateProcessor';
+return 'vpRouteCreateProcessor';

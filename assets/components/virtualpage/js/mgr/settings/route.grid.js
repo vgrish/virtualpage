@@ -1,268 +1,452 @@
-virtualpage.grid.Route = function(config) {
-    config = config || {};
+virtualpage.grid.Route = function (config) {
+	config = config || {};
 
-    this.exp = new Ext.grid.RowExpander({
-        expandOnDblClick: false,
-        tpl: new Ext.Template('<p class="desc">{description}</p>'),
-        renderer: function(v, p, record) {
-            return record.data.description != '' && record.data.description != null ? '<div class="x-grid3-row-expander">&#160;</div>' : '&#160;';
-        }
-    });
-    this.dd = function(grid) {
-        this.dropTarget = new Ext.dd.DropTarget(grid.container, {
-            ddGroup: 'dd',
-            copy: false,
-            notifyDrop: function(dd, e, data) {
-                var store = grid.store.data.items;
-                var target = store[dd.getDragData(e).rowIndex].id;
-                var source = store[data.rowIndex].id;
-                if (target != source) {
-                    dd.el.mask(_('loading'), 'x-mask-loading');
-                    MODx.Ajax.request({
-                        url: virtualpage.config.connector_url,
-                        params: {
-                            action: config.action || 'mgr/settings/route/sort',
-                            source: source,
-                            target: target
-                        },
-                        listeners: {
-                            success: {
-                                fn: function(r) {
-                                    dd.el.unmask();
-                                    grid.refresh();
-                                },
-                                scope: grid
-                            },
-                            failure: {
-                                fn: function(r) {
-                                    dd.el.unmask();
-                                },
-                                scope: grid
-                            }
-                        }
-                    });
-                }
-            }
-        });
-    };
-    Ext.applyIf(config, {
-        id: 'virtualpage-grid-route',
-        url: virtualpage.config.connector_url,
-        baseParams: {
-            action: 'mgr/settings/route/getlist'
-        },
-        fields: this.getFields(config),
-        columns: this.getColumns(config),
-        tbar: this.getTopBar(config),
-        listeners: this.getListeners(config),
-        paging: true,
-        remoteSort: true,
-        autoHeight: true,
-        save_action: 'mgr/settings/route/updatefromgrid',
-        autosave: true,
-        save_callback: this.updateRow,
-        plugins: this.exp,
-        ddGroup: 'dd',
-        enableDragDrop: true
+	this.exp = new Ext.grid.RowExpander({
+		expandOnDblClick: false,
+		enableCaching: false,
+		tpl: new Ext.XTemplate(
+			'<tpl for=".">',
 
-    });
-    virtualpage.grid.Route.superclass.constructor.call(this, config);
+			'<table class="virtualpage-expander"><tbody>',
+
+			'<tpl if="description">',
+			'<tr>',
+			'<td><b>' + _('virtualpage_description') + ': </b>{description}</td>',
+			'</tr>',
+			'</tpl>',
+
+			' </tbody></table>',
+
+			'</tpl>',
+			{
+				compiled: true,
+			}
+		),
+		renderer: function (v, p, record) {
+			return !!record.json['description'] ? '<div class="x-grid3-row-expander">&#160;</div>' : '&#160;';
+		}
+	});
+
+	this.exp.on('beforeexpand', function (rowexpander, record, body, rowIndex) {
+		record['data']['json'] = record['json'];
+		record['data'] = Ext.applyIf(record['data'], record['json']);
+		return true;
+	});
+
+	this.dd = function (grid) {
+		this.dropTarget = new Ext.dd.DropTarget(grid.container, {
+			ddGroup: 'dd',
+			copy: false,
+			notifyDrop: function (dd, e, data) {
+				var store = grid.store.data.items;
+				var target = store[dd.getDragData(e).rowIndex].id;
+				var source = store[data.rowIndex].id;
+				if (target != source) {
+					dd.el.mask(_('loading'), 'x-mask-loading');
+					MODx.Ajax.request({
+						url: virtualpage.config.connector_url,
+						params: {
+							action: config.action || 'mgr/route/sort',
+							source: source,
+							target: target
+						},
+						listeners: {
+							success: {
+								fn: function (r) {
+									dd.el.unmask();
+									grid.refresh();
+								},
+								scope: grid
+							},
+							failure: {
+								fn: function (r) {
+									dd.el.unmask();
+								},
+								scope: grid
+							}
+						}
+					});
+				}
+			}
+		});
+	};
+
+	this.sm = new Ext.grid.CheckboxSelectionModel();
+
+	Ext.applyIf(config, {
+		url: virtualpage.config.connector_url,
+		baseParams: {
+			action: 'mgr/route/getlist',
+			sort: 'rank',
+			dir: 'asc'
+		},
+		save_action: 'mgr/route/updatefromgrid',
+		autosave: true,
+		save_callback: this._updateRow,
+		fields: this.getFields(config),
+		columns: this.getColumns(config),
+		tbar: this.getTopBar(config),
+		listeners: this.getListeners(config),
+
+		sm: this.sm,
+		plugins: [this.exp],
+
+		ddGroup: 'dd',
+		enableDragDrop: true,
+
+		paging: true,
+		pageSize: 10,
+		remoteSort: true,
+		viewConfig: {
+			forceFit: true,
+			enableRowBody: true,
+			autoFill: true,
+			showPreview: true,
+			scrollOffset: 0
+		},
+		autoHeight: true,
+		cls: 'virtualpage-grid',
+		bodyCssClass: 'grid-with-buttons',
+		stateful: false,
+	});
+	virtualpage.grid.Route.superclass.constructor.call(this, config);
+	this.exp.addEvents('beforeexpand', 'beforecollapse');
+
 };
 Ext.extend(virtualpage.grid.Route, MODx.grid.Grid, {
-    windows: {},
+	windows: {},
 
-    getFields: function(config) {
-        var fields = ['id', 'metod', 'route', 'handler', 'description', 'properties', 'active', 'event', 'handler_name'];
+	getFields: function (config) {
+		var fields = [
+			'id', 'metod', 'route', 'handler', 'description', 'properties', 'active',
+			'event', 'handler_name', 'rank', 'properties', 'actions'
+		];
 
-        return fields;
-    },
+		return fields;
+	},
 
-    getColumns: function(config) {
-        var columns = [this.exp];
-        var add = {
-            id: {
-                width: 25,
-                sortable: true
-            },
-            route: {
-                width: 50,
-                sortable: true,
-                editor: {
-                    xtype: 'textfield',
-                    allowBlank: false
-                }
-            },
-            metod: {
-                width: 50,
-                sortable: true,
-                editor: {
-                    xtype: 'virtualpage-combo-metod',
-                    allowBlank: false
-                }
-            },
-            handler: {
-                width: 35,
-                sortable: true,
-                editor: {
-                    xtype: 'virtualpage-combo-handler',
-                    allowBlank: false
-                },
-                renderer: virtualpage.tools.renderHandler
-            },
-            event: {
-                width: 35,
-                sortable: true,
-                editor: {
-                    xtype: 'virtualpage-combo-event',
-                    allowBlank: false
-                },
-                renderer: virtualpage.tools.renderEvent
-            },
-            active: {
-                width: 35,
-                sortable: false,
-                editor: {
-                    xtype: 'combo-boolean',
-                    renderer: 'boolean'
-                }
-            }
-        };
+	getTopBar: function (config) {
+		var tbar = [];
 
-        for (var field in add) {
-            if (add[field]) {
-                Ext.applyIf(add[field], {
-                    header: _('vp_' + field),
-                    tooltip: _('vp_tooltip_' + field),
-                    dataIndex: field
-                });
-                columns.push(add[field]);
-            }
-        }
+		var component = ['menu', 'download', 'left', 'search', 'spacer'];
 
-        return columns;
-    },
+		var add = {
+			menu: {
+				text: '<i class="icon icon-cogs"></i> ',
+				menu: [{
+					text: '<i class="icon icon-plus"></i> ' + _('virtualpage_action_create'),
+					cls: 'virtualpage-cogs',
+					handler: this.create,
+					scope: this
+				}, {
+					text: '<i class="icon icon-trash-o red"></i> ' + _('virtualpage_action_remove'),
+					cls: 'virtualpage-cogs',
+					handler: this.remove,
+					scope: this
+				}, '-', {
+					text: '<i class="icon icon-toggle-on green"></i> ' + _('virtualpage_action_turnon'),
+					cls: 'virtualpage-cogs',
+					handler: this.active,
+					scope: this
+				}, {
+					text: '<i class="icon icon-toggle-off red"></i> ' + _('virtualpage_action_turnoff'),
+					cls: 'virtualpage-cogs',
+					handler: this.inactive,
+					scope: this
+				}]
+			},
+			left: '->',
 
-    getTopBar: function(config) {
-        var tbar = [];
-        tbar.push({
-            text: _('vp_btn_create'),
-            handler: this.createRoute,
-            scope: this
-        });
+			search: {
+				xtype: 'virtualpage-field-search',
+				width: 190,
+				listeners: {
+					search: {
+						fn: function (field) {
+							this._doSearch(field);
+						},
+						scope: this
+					},
+					clear: {
+						fn: function (field) {
+							field.setValue('');
+							this._clearSearch();
+						},
+						scope: this
+					}
+				}
+			},
 
-        return tbar;
-    },
+			spacer: {
+				xtype: 'spacer',
+				style: 'width:1px;'
+			}
+		};
 
-    getMenu: function() {
-        var m = [];
-        m.push({
-            text: _('vp_menu_update'),
-            handler: this.updateRoute
-        });
-        m.push('-');
-        m.push({
-            text: _('vp_menu_remove'),
-            handler: this.removeRoute
-        });
-        this.addContextMenuItem(m);
-    },
+		component.filter(function (item) {
+			if (add[item]) {
+				tbar.push(add[item]);
+			}
+		});
 
-    getListeners: function(config) {
-        var listeners = {};
-        listeners.render = {fn: this.dd, scope: this};
+		var items = [];
+		if (tbar.length > 0) {
+			items.push(new Ext.Toolbar(tbar));
+		}
 
-        return listeners;
-    },
+		return new Ext.Panel({items: items});
+	},
 
-    updateRow: function(response) {
-        this.refresh();
-    },
+	getColumns: function (config) {
+		var columns = [this.exp, this.sm];
+		var add = {
+			id: {
+				width: 5,
+				/*hidden: true,*/
+			},
+			route: {
+				width: 10,
+				sortable: true,
+				editor: {
+					xtype: 'textfield',
+					allowBlank: false
+				}
+			},
+			metod: {
+				width: 10,
+				sortable: true,
+				editor: {
+					xtype: 'virtualpage-combo-metod',
+					allowBlank: false
+				}
+			},
+			handler: {
+				width: 10,
+				sortable: true,
+				editor: {
+					xtype: 'virtualpage-combo-handler',
+					allowBlank: false
+				},
+				renderer: virtualpage.tools.renderHandler
+			},
+			event: {
+				width: 10,
+				sortable: true,
+				editor: {
+					xtype: 'virtualpage-combo-event',
+					allowBlank: false
+				},
+				renderer: virtualpage.tools.renderEvent
+			},
+			actions: {
+				width: 10,
+				sortable: false,
+				id: 'actions',
+				renderer: virtualpage.tools.renderActions,
+			}
+		};
 
-    createRoute: function(btn, e) {
-        var record = {
-            active: 1,
-            metod: 'GET,POST'
-        };
-        var w = Ext.getCmp('virtualpage-window-route-create');
-        if (w) {
-            w.hide().getEl().remove();
-        }
-        w = MODx.load({
-            xtype: 'virtualpage-window-route-update',
-            title: _('vp_menu_create'),
-            action: 'mgr/settings/route/create',
-            record: record,
-            id: 'virtualpage-window-route-create',
-            listeners: {
-                success: {
-                    fn: this.refresh,
-                    scope: this
-                }
-            }
-        });
-        w.fp.getForm().reset();
-        w.fp.getForm().setValues(record);
-        w.show(e.target);
-    },
+		var fields = this.getFields();
+		fields.filter(function (field) {
+			if (add[field]) {
+				Ext.applyIf(add[field], {
+					header: _('virtualpage_header_' + field),
+					tooltip: _('virtualpage_tooltip_' + field),
+					dataIndex: field
+				});
+				columns.push(add[field]);
+			}
+		});
 
-    updateRoute: function(btn, e, row) {
-        var record = typeof(row) != 'undefined' ? row.data : this.menu.record;
+		return columns;
+	},
 
-        MODx.Ajax.request({
-            url: virtualpage.config.connector_url,
-            params: {
-                action: 'mgr/settings/route/get',
-                id: record.id
-            },
-            listeners: {
-                success: {
-                    fn: function(r) {
-                        var record = r.object;
-                        if (!!record.properties) {
-                            record.properties = Ext.util.JSON.encode(record.properties);
-                        }
-                        var w = MODx.load({
-                            xtype: 'virtualpage-window-route-update',
-                            record: record,
-                            listeners: {
-                                success: {
-                                    fn: this.refresh,
-                                    scope: this
-                                }
-                            }
-                        });
-                        w.fp.getForm().reset();
-                        w.fp.getForm().setValues(record);
-                        w.show(e.target);
-                    },
-                    scope: this
-                }
-            }
-        });
-    },
+	getListeners: function (config) {
+		return Ext.applyIf(config.listeners || {}, {
+			render: {
+				fn: this.dd,
+				scope: this
+			}
+		});
+	},
 
-    removeRoute: function(btn, e) {
-        if (!this.menu.record) return false;
+	getMenu: function (grid, rowIndex) {
+		var ids = this._getSelectedIds();
+		var row = grid.getStore().getAt(rowIndex);
+		var menu = virtualpage.tools.getMenu(row.data['actions'], this, ids);
+		this.addContextMenuItem(menu);
+	},
 
-        MODx.msg.confirm({
-            title: _('vp_menu_remove') + ' "' + this.menu.record.name + '"',
-            text: _('vp_menu_remove_confirm'),
-            url: this.config.url,
-            params: {
-                action: 'mgr/settings/route/remove',
-                id: this.menu.record.id,
-                event: this.menu.record.event
-            },
-            listeners: {
-                success: {
-                    fn: function (r) {
-                        this.refresh();
-                    },
-                    scope: this
-                }
-            }
-        });
-    }
+	onClick: function (e) {
+		var elem = e.getTarget();
+		if (elem.nodeName == 'BUTTON') {
+			var row = this.getSelectionModel().getSelected();
+			if (typeof(row) != 'undefined') {
+				var action = elem.getAttribute('action');
+				if (action == 'showMenu') {
+					var ri = this.getStore().find('id', row.id);
+					return this._showMenu(this, ri, e);
+				} else if (typeof this[action] === 'function') {
+					this.menu.record = row.data;
+					return this[action](this, e);
+				}
+			}
+		}
+		return this.processEvent('click', e);
+	},
+
+	setAction: function (method, field, value) {
+		var ids = this._getSelectedIds();
+		if (!ids.length && (field !== 'false')) {
+			return false;
+		}
+		MODx.Ajax.request({
+			url: virtualpage.config.connector_url,
+			params: {
+				action: 'mgr/route/multiple',
+				method: method,
+				field_name: field,
+				field_value: value,
+				ids: Ext.util.JSON.encode(ids)
+			},
+			listeners: {
+				success: {
+					fn: function () {
+						this.refresh();
+					},
+					scope: this
+				},
+				failure: {
+					fn: function (response) {
+						MODx.msg.alert(_('error'), response.message);
+					},
+					scope: this
+				}
+			}
+		})
+	},
+
+	remove: function (text, action) {
+		if (this.destroying) {
+			return MODx.grid.Grid.superclass.remove.apply(this, arguments);
+		}
+
+		Ext.MessageBox.confirm(
+			_('virtualpage_action_remove'),
+			_('virtualpage_confirm_remove'),
+			function (e) {
+				if (e == 'yes') {
+					this.setAction('remove');
+				} else {
+					this.fireRoute('cancel');
+				}
+			}, this);
+	},
+
+	active: function (btn, e) {
+		this.setAction('setproperty', 'active', 1);
+	},
+
+	inactive: function (btn, e) {
+		this.setAction('setproperty', 'active', 0);
+	},
+
+	create: function (btn, e) {
+		var record = {
+			type: 0,
+			active: 1
+		};
+		
+		var w = MODx.load({
+			xtype: 'virtualpage-window-route-update',
+			action: 'mgr/route/create',
+			record: record,
+			class: this.config.class,
+			listeners: {
+				success: {
+					fn: function () {
+						this.refresh();
+					}, scope: this
+				}
+			}
+		});
+		w.reset();
+		w.setValues(record);
+		w.show(e.target);
+	},
+
+	update: function (btn, e, row) {
+		if (typeof(row) != 'undefined') {
+			this.menu.record = row.data;
+		}
+		else if (!this.menu.record) {
+			return false;
+		}
+		var id = this.menu.record.id;
+		MODx.Ajax.request({
+			url: this.config.url,
+			params: {
+				action: 'mgr/route/get',
+				id: id
+			},
+			listeners: {
+				success: {
+					fn: function (r) {
+						var record = r.object;
+						var w = MODx.load({
+							xtype: 'virtualpage-window-route-update',
+							title: _('virtualpage_action_update'),
+							action: 'mgr/route/update',
+							record: record,
+							update: true,
+							listeners: {
+								success: {
+									fn: this.refresh,
+									scope: this
+								}
+							}
+						});
+						w.reset();
+						w.setValues(record);
+						w.show(e.target);
+					}, scope: this
+				}
+			}
+		});
+	},
+
+	_filterByCombo: function (cb) {
+		this.getStore().baseParams[cb.name] = cb.value;
+		this.getBottomToolbar().changePage(1);
+	},
+
+	_doSearch: function (tf) {
+		this.getStore().baseParams.query = tf.getValue();
+		this.getBottomToolbar().changePage(1);
+	},
+
+	_clearSearch: function () {
+		this.getStore().baseParams.query = '';
+		this.getBottomToolbar().changePage(1);
+	},
+
+	_updateRow: function () {
+		this.refresh();
+	},
+
+	_getSelectedIds: function () {
+		var ids = [];
+		var selected = this.getSelectionModel().getSelections();
+
+		for (var i in selected) {
+			if (!selected.hasOwnProperty(i)) {
+				continue;
+			}
+			ids.push(selected[i]['id']);
+		}
+
+		return ids;
+	}
 
 });
 Ext.reg('virtualpage-grid-route', virtualpage.grid.Route);
