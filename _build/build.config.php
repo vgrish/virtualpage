@@ -40,7 +40,6 @@ define('BUILD_PLUGIN_STATIC', false);
 
 $BUILD_VALIDATORS = array(
     'phpversion',
-    //'oldversion',
     'vendors'
 );
 
