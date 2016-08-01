@@ -91,7 +91,7 @@ virtualpage.combo.Event = function(config) {
 		hideMode: 'offsets',
 		url: virtualpage.config.connector_url,
 		baseParams: {
-			action: 'mgr/settings/event/getlist',
+			action: 'mgr/event/getlist',
 			combo: true,
 			limit: 0
 		}
@@ -115,7 +115,7 @@ virtualpage.combo.Handler = function(config) {
 		hideMode: 'offsets',
 		url: virtualpage.config.connector_url,
 		baseParams: {
-			action: 'mgr/settings/handler/getlist',
+			action: 'mgr/handler/getlist',
 			combo: true,
 			limit: 0
 		}
