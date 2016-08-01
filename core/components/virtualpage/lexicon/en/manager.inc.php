@@ -13,8 +13,11 @@ $_lang['virtualpage_header_type'] = '<i class="icon icon-asterisk"></i>';
 $_lang['virtualpage_header_unit'] = '<i class="icon icon-info"></i>';
 $_lang['virtualpage_header_name'] = '<i class="icon icon-info"></i>';
 $_lang['virtualpage_header_value'] = '<i class="icon icon-info"></i>';
-$_lang['virtualpage_header_city'] = '<i class="icon icon-info"></i>';
-$_lang['virtualpage_header_cityID'] = '<i class="icon icon-info"></i>';
+$_lang['virtualpage_header_entry'] = '<i class="icon icon-info"></i>';
+$_lang['virtualpage_header_route'] = '<i class="icon icon-link"></i>';
+$_lang['virtualpage_header_metod'] = '<i class="icon icon-info"></i>';
+$_lang['virtualpage_header_handler'] = '<i class="icon icon-info"></i>';
+$_lang['virtualpage_header_event'] = '<i class="icon icon-info"></i>';
 
 
 // tooltip
@@ -26,6 +29,12 @@ $_lang['virtualpage_tooltip_key'] = 'Ключ';
 $_lang['virtualpage_tooltip_name'] = 'Название';
 $_lang['virtualpage_tooltip_value'] = 'Значение';
 $_lang['virtualpage_tooltip_description'] = 'Описание';
+$_lang['virtualpage_tooltip_entry'] = 'Запись';
+$_lang['virtualpage_tooltip_type'] = 'Тип';
+$_lang['virtualpage_tooltip_route'] = 'Маршрут';
+$_lang['virtualpage_tooltip_metod'] = 'Метод';
+$_lang['virtualpage_tooltip_handler'] = 'Обработчик';
+$_lang['virtualpage_tooltip_event'] = 'Событие';
 
 
 // fields
