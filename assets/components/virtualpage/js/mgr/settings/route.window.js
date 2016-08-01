@@ -77,7 +77,7 @@ Ext.extend(virtualpage.window.UpdateRoute, MODx.Window, {
 				}]
 			}, {
 				xtype: 'textarea',
-				fieldLabel: _('virtualpage_placeholders'),
+				fieldLabel: _('virtualpage_properties'),
 				name: 'properties',
 				setValue: function (value) {
 					if (Ext.isObject(value)) {
