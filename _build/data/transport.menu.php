@@ -4,7 +4,7 @@ $menus = array();
 
 $tmp = array(
     'virtualpage' => array(
-        'description' => 'vp_menu_desc',
+        'description' => 'virtualpage_menu_desc',
         'action'      => array(
             'controller' => 'index',
         ),

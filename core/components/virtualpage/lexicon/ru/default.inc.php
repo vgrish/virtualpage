@@ -6,6 +6,7 @@ include_once 'setting.inc.php';
 
 $_lang['virtualpage'] = 'VirtualPage';
 $_lang['virtualpage_menu_desc'] = 'Управление виртуальными страницами.';
+$_lang['vp_menu_desc'] = 'Управление виртуальными страницами.';
 
 $_lang['virtualpage_settings'] = 'Настройки';
 
