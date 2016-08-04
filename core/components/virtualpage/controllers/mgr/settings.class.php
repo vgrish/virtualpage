@@ -17,7 +17,7 @@ class virtualpageSettingsManagerController extends virtualpageMainController
 
     public function getPageTitle()
     {
-        return $this->modx->lexicon('virtualpage') . ' :: ' . $this->modx->lexicon('vp_settings');
+        return $this->modx->lexicon('virtualpage') . ' :: ' . $this->modx->lexicon('virtualpage_settings');
     }
 
     public function getLanguageTopics()
