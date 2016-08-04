@@ -1,5 +1,9 @@
 Changelog for virtualpage.
 
+2.0.2-beta (04.08.2016)
+==============
+- Fix "data"
+
 2.0.1-beta (01.08.2016)
 ==============
 - Improvement "dispatch"

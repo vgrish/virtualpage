@@ -396,9 +396,9 @@ class virtualpage
         @list($found, $key, $fastroute) = $dispatcher->dispatch($this->getMethod(), $uri);
 
         if ($found == FastRoute\Dispatcher::FOUND AND isset($virtualPageRoutes[$key])) {
-            $data = $virtualPageRoutes[$key];
-            $data['uri'] = $uri;
-            $data['fastroute'] = $fastroute;
+            $data = array_merge($virtualPageRoutes[$key], $fastroute, array(
+                'uri' => $uri
+            ));
 
             return $this->handle($data);
         }
