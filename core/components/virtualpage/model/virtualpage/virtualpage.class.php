@@ -276,7 +276,7 @@ class virtualpage
                 "vpHandler.active" => 1,
             ));
             $q->sortby("vpRoute.rank", "ASC");
-            $q->select('vpRoute.metod, vpRoute.route, vpRoute.handler, vpRoute.properties, vpEvent.name as event');
+            $q->select('vpRoute.metod, vpRoute.route, vpRoute.properties, vpEvent.name as event, vpRoute.id as route_id');
             $q->select($this->modx->getSelectColumns('vpHandler', 'vpHandler', 'handler_'));
 
             if ($q->prepare() AND $q->stmt->execute()) {
@@ -284,7 +284,7 @@ class virtualpage
                     if (isset($row['properties'])) {
                         $row['properties'] = json_decode($row['properties'], true);
                     }
-                    $routes[] = $row;
+                    $routes[implode(array($row['route_id'], $row['handler_id']), ',')] = $row;
                 }
             }
             $this->setCache($routes, $tmp);
@@ -301,8 +301,8 @@ class virtualpage
         );
         if (!$routes = $this->getCache($tmp)) {
             $routes = array();
-            foreach ($this->getAllRoutes() as $row) {
-                $routes[$row['event']][] = $row;
+            foreach ($this->getAllRoutes() as $key => $row) {
+                $routes[$row['event']][$key] = $row;
             }
             $this->setCache($routes, $tmp);
         }
@@ -319,7 +319,7 @@ class virtualpage
         if (!$routes = $this->getCache($tmp)) {
             $routes = array();
 
-            foreach ($this->getAllRoutes() as $row) {
+            foreach ($this->getAllRoutes() as $key => $row) {
                 $metods = $this->getOption('metod', $row);
                 $metods = $this->explodeAndClean($metods);
 
@@ -327,7 +327,7 @@ class virtualpage
                     $routes[$row['event']][] = array(
                         $metod,
                         $row['route'],
-                        $row['handler'],
+                        $key,
                     );
                 }
             }
@@ -393,20 +393,14 @@ class virtualpage
 
         $uri = $this->getUri();
         $dispatcher = $this->getDispatcher($fastRouteRoutes);
-        @list($found, $handlerId, $fastroute) = $dispatcher->dispatch($this->getMethod(), $uri);
+        @list($found, $key, $fastroute) = $dispatcher->dispatch($this->getMethod(), $uri);
 
-        if ($found == FastRoute\Dispatcher::FOUND) {
-            foreach ($virtualPageRoutes as $data) {
-                $match = array();
-                preg_match_all("/{([^}]+)}*/i", $data['route'], $match);
-                $url = str_replace($match[0], array_values($fastroute), $data['route']);
-                if ($url == $uri) {
-                    $data['uri'] = $uri;
-                    $data['fastroute'] = $fastroute;
+        if ($found == FastRoute\Dispatcher::FOUND AND isset($virtualPageRoutes[$key])) {
+            $data = $virtualPageRoutes[$key];
+            $data['uri'] = $uri;
+            $data['fastroute'] = $fastroute;
 
-                    return $this->handle($data);
-                }
-            }
+            return $this->handle($data);
         }
 
         return true;
