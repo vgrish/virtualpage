@@ -1,5 +1,9 @@
 Changelog for virtualpage.
 
+2.0.3-beta (10.09.2016)
+==============
+- Fix "entry getlist"
+
 2.0.2-beta (04.08.2016)
 ==============
 - Fix "data"

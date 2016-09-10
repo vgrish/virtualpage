@@ -43,26 +43,6 @@ class vpEntryGetListProcessor extends modObjectProcessor
         $c->select("{$name} as name, id as id");
         $c->groupby($name);
 
-        if (
-            $this->getProperty('combo')
-            AND
-            !empty($id)
-            AND
-            empty($start)
-        ) {
-            $q = $this->modx->newQuery($class);
-            $q->where(array('id!=' => $id));
-            $q->select('id');
-            $q->limit($this->getProperty('limit', 10) - 1);
-            $q->prepare();
-            $q->stmt->execute();
-            $ids = $q->stmt->fetchAll(PDO::FETCH_COLUMN, 0);
-            $ids = array_merge_recursive(array($id), $ids);
-            $c->where(array(
-                "{$class}.id:IN" => $ids
-            ));
-        }
-
         $c->limit(0);
         if (!empty($query)) {
             $c->where(array("{$name}:LIKE" => "%{$query}%"));
