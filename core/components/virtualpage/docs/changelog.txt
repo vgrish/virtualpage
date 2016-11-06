@@ -1,5 +1,9 @@
 Changelog for virtualpage.
 
+2.0.4-beta (07.11.2016)
+==============
+- Add "cache_prefix" to "cacheKey"
+
 2.0.3-beta (10.09.2016)
 ==============
 - Fix "entry getlist"

@@ -363,7 +363,11 @@ class virtualpage
 
     protected function getDispatcher($routes = array())
     {
-        $cacheKey = $this->modx->getOption(xPDO::OPT_CACHE_PATH) . 'default/' . $this->namespace . '/fastroute/' . sha1(serialize($routes));
+        $cachePrefix = trim($this->modx->getOption('cache_prefix'), '/');
+        if (!empty($cachePrefix)) {
+            $cachePrefix = '/' . $cachePrefix;
+        }
+        $cacheKey = $this->modx->getOption(xPDO::OPT_CACHE_PATH) . 'default/' . $this->namespace . $cachePrefix . '/fastroute/' . sha1(serialize($routes));
         $dispatcher = FastRoute\cachedDispatcher(function (FastRoute\RouteCollector $route) use ($routes) {
             $this->getRoutes($route, $routes);
         }, array('cacheFile' => $cacheKey . '.cache.php'));
