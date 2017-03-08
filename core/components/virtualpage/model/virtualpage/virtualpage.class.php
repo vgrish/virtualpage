@@ -12,7 +12,7 @@ class virtualpage
     public $modx;
 
     public $namespace = 'virtualpage';
-    public $version = '2.0.0-beta';
+    public $version = '2.0.4-beta';
     public $initialized = array();
     public $config = array();
     public $active = false;
@@ -664,9 +664,24 @@ class virtualpage
      */
     public function newResource(array $data = array())
     {
+        $class = 'modResource';
+        $rid = intval(isset($data['rid']) ? $data['rid'] : 0);
+        if ($rid AND $r = $this->modx->getObject('modResource', $rid)) {
+            $class = $r->get('class_key');
+        }
+
         /** @var modResource $resource */
-        if ($resource = $this->modx->newObject('modResource')) {
-            $resource->fromArray(array(
+        $resource = $this->modx->newObject($class);
+        if ($rid AND $r) {
+            $data = array_merge($r->toArray(), array(
+                'template'  => $data['handler_entry'],
+                'cacheable' => $data['handler_cache'],
+                'uri'       => $data['uri'],
+                'published' => true,
+                'id'        => $rid
+            ));
+        } else {
+            $data = array(
                 'pagetitle' => $data['handler_description'] ?: $data['handler_name'],
                 'content'   => $data['handler_content'],
                 'template'  => $data['handler_entry'],
@@ -674,8 +689,9 @@ class virtualpage
                 'uri'       => $data['uri'],
                 'published' => true,
                 'id'        => $this->modx->getOption('site_start')
-            ), '', true, true, true);
+            );
         }
+        $resource->fromArray($data, '', true, true, true);
 
         $this->modx->invokeEvent('vpOnResourceAfterCreate', array(
             'mode'     => modSystemEvent::MODE_NEW,
