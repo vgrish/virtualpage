@@ -12,7 +12,7 @@ class virtualpage
     public $modx;
 
     public $namespace = 'virtualpage';
-    public $version = '2.0.4-beta';
+    public $version = '2.0.5-beta';
     public $initialized = array();
     public $config = array();
     public $active = false;
