@@ -45,6 +45,6 @@ $BUILD_VALIDATORS = array(
 
 $BUILD_RESOLVERS = array(
     'tables',
-    'plugins',
+    'plugins', 
     'event',
 );
