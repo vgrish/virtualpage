@@ -1,14 +1,5 @@
 <?php
 
-/**
- * Download file
- *
- * @param $src
- * @param $dst
- *
- * @return bool
- */
-
 if (!function_exists('download')) {
     function download($src, $dst)
     {
@@ -38,7 +29,6 @@ if (!function_exists('download')) {
     }
 }
 
-
 /** @var $modx modX */
 if (!$modx = $object->xpdo AND !$object->xpdo instanceof modX) {
     return true;
@@ -64,12 +54,6 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
                 'https://github.com/nikic/FastRoute/archive/master.zip',
                 MODX_CORE_PATH . 'components/virtualpage/vendor/',
             ),
-            /*array(
-                'cropper',
-                'cropper',
-                'https://github.com/fengyuanchen/cropper/archive/master.zip',
-                MODX_ASSETS_PATH . 'components/userfiles/vendor/'
-            ),*/
         );
 
         foreach ($vendors as $vendor) {
@@ -90,10 +74,7 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
             }
 
             $modx->log(modX::LOG_LEVEL_INFO, "Trying to download <b>{$name}</b>. Please wait...");
-            if (!download($url, $path . $tmp)) {
-                $modx->log(modX::LOG_LEVEL_INFO, "loading error");
-                return false;
-            }
+            download($url, $path . $tmp);
 
             $file = new PclZip($path . $tmp);
             if ($files = $file->extract(PCLZIP_OPT_PATH, $path)) {
@@ -115,14 +96,13 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
                 }
 
                 $modx->log(modX::LOG_LEVEL_INFO, "<b>{$name}</b> was successfully installed");
-
             } else {
                 $modx->log(xPDO::LOG_LEVEL_INFO,
                     "Could not extract <b>{$name}</b> from <b>{$tmp}</b> to <b>{$path}</b>. Error: " . $file->errorInfo());
-
-                die;
             }
+
         }
+
 
         break;
 

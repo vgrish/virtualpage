@@ -4,7 +4,7 @@
 define('PKG_NAME', 'virtualpage');
 define('PKG_NAME_LOWER', strtolower(PKG_NAME));
 
-define('PKG_VERSION', '2.0.5');
+define('PKG_VERSION', '2.0.6');
 define('PKG_RELEASE', 'beta');
 define('PKG_AUTO_INSTALL', true);
 define('PKG_NAMESPACE_PATH', '{core_path}components/' . PKG_NAME_LOWER . '/');
@@ -40,10 +40,11 @@ define('BUILD_PLUGIN_STATIC', false);
 
 $BUILD_VALIDATORS = array(
     'phpversion',
-    'vendors'
+    //'vendors',
 );
 
 $BUILD_RESOLVERS = array(
+    'vendors',
     'tables',
     'plugins', 
     'event',

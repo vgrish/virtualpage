@@ -4,7 +4,7 @@
  * The base class for virtualpage.
  */
 
-include_once dirname(dirname(dirname(__FILE__))) . '/vendor/fastroute/src/bootstrap.php';
+include_once dirname(dirname(__DIR__)) . '/vendor/fastroute/src/bootstrap.php';
 
 class virtualpage
 {
