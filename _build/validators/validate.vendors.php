@@ -1,44 +1,5 @@
 <?php
 
-/**
- * Download file
- *
- * @param $src
- * @param $dst
- *
- * @return bool
- */
-
-if (!function_exists('download')) {
-    function download($src, $dst)
-    {
-        if (ini_get('allow_url_fopen')) {
-            $file = @file_get_contents($src);
-        } else {
-            if (function_exists('curl_init')) {
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $src);
-                curl_setopt($ch, CURLOPT_HEADER, 0);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 180);
-                $safeMode = @ini_get('safe_mode');
-                $openBasedir = @ini_get('open_basedir');
-                if (empty($safeMode) && empty($openBasedir)) {
-                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-                }
-                $file = curl_exec($ch);
-                curl_close($ch);
-            } else {
-                return false;
-            }
-        }
-        file_put_contents($dst, $file);
-
-        return file_exists($dst);
-    }
-}
-
-
 /** @var $modx modX */
 if (!$modx = $object->xpdo AND !$object->xpdo instanceof modX) {
     return true;
@@ -62,14 +23,8 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
                 'fastroute',
                 'fastroute',
                 'https://github.com/nikic/FastRoute/archive/master.zip',
-                MODX_CORE_PATH . 'components/virtualpage/vendor/',
+                MODX_CORE_PATH . 'components/virtualpage/vendor/'
             ),
-            /*array(
-                'cropper',
-                'cropper',
-                'https://github.com/fengyuanchen/cropper/archive/master.zip',
-                MODX_ASSETS_PATH . 'components/userfiles/vendor/'
-            ),*/
         );
 
         foreach ($vendors as $vendor) {
@@ -90,10 +45,7 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
             }
 
             $modx->log(modX::LOG_LEVEL_INFO, "Trying to download <b>{$name}</b>. Please wait...");
-            if (!download($url, $path . $tmp)) {
-                $modx->log(modX::LOG_LEVEL_INFO, "loading error");
-                return false;
-            }
+            download($url, $path . $tmp);
 
             $file = new PclZip($path . $tmp);
             if ($files = $file->extract(PCLZIP_OPT_PATH, $path)) {
@@ -115,14 +67,15 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
                 }
 
                 $modx->log(modX::LOG_LEVEL_INFO, "<b>{$name}</b> was successfully installed");
-
             } else {
                 $modx->log(xPDO::LOG_LEVEL_INFO,
                     "Could not extract <b>{$name}</b> from <b>{$tmp}</b> to <b>{$path}</b>. Error: " . $file->errorInfo());
 
                 die;
             }
+
         }
+
 
         break;
 
@@ -131,3 +84,38 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
 }
 
 return true;
+
+/**
+ * Download file
+ *
+ * @param $src
+ * @param $dst
+ *
+ * @return bool
+ */
+function download($src, $dst)
+{
+    if (ini_get('allow_url_fopen')) {
+        $file = @file_get_contents($src);
+    } else {
+        if (function_exists('curl_init')) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $src);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 180);
+            $safeMode = @ini_get('safe_mode');
+            $openBasedir = @ini_get('open_basedir');
+            if (empty($safeMode) && empty($openBasedir)) {
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+            }
+            $file = curl_exec($ch);
+            curl_close($ch);
+        } else {
+            return false;
+        }
+    }
+    file_put_contents($dst, $file);
+
+    return file_exists($dst);
+}
